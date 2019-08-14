@@ -1,6 +1,5 @@
 package gateway.wrb.controllers;
 
-import com.oracle.tools.packager.Log;
 import gateway.wrb.config.FbkConfig;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
@@ -9,6 +8,7 @@ import gateway.wrb.services.HT002Service;
 import gateway.wrb.services.RV001Service;
 import gateway.wrb.services.RV002Service;
 import gateway.wrb.util.FileUtils;
+import gateway.wrb.util.SftpUtils;
 import gateway.wrb.util.Validator;
 import lombok.extern.log4j.Log4j;
 import org.slf4j.Logger;
@@ -21,6 +21,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,18 +49,18 @@ public class FbkController {
 
     @GetMapping(value = "/all")
     public ResponseEntity<?> readFiles() {
-        Log.info("--------- START ---------- ::" + System.currentTimeMillis());
+        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<FbkFilesInfo> fbkList = importFiles();
         if (fbkList.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        Log.info("--------- END ---------- ::" + System.currentTimeMillis());
+        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(fbkList, HttpStatus.OK);
     }
 
     @GetMapping(value = "/rv001")
     public ResponseEntity<?> importrv001() {
-        Log.info("--------- START ---------- ::" + System.currentTimeMillis());
+        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<FbkFilesInfo> rv001Files = new ArrayList<>();
         String directory = fbkConfig.getFbkPath();
         List<Map<String, FbkFilesInfo>> fbkFiles = fbkFilesService.getFbkFiles(directory);
@@ -77,13 +79,13 @@ public class FbkController {
         if (rv001Files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        Log.info("--------- END ---------- ::" + System.currentTimeMillis());
+        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(rv001Files, HttpStatus.OK);
     }
 
     @GetMapping(value = "/rv002")
     public ResponseEntity<?> importrv002() {
-        Log.info("--------- START ---------- ::" + System.currentTimeMillis());
+        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<FbkFilesInfo> rv002Files = new ArrayList<>();
         String directory = fbkConfig.getFbkPath();
         List<Map<String, FbkFilesInfo>> fbkFiles = fbkFilesService.getFbkFiles(directory);
@@ -102,13 +104,14 @@ public class FbkController {
         if (rv002Files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        Log.info("--------- END ---------- ::" + System.currentTimeMillis());
+        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(rv002Files, HttpStatus.OK);
     }
 
+
     @GetMapping(value = "/ht002")
     public ResponseEntity<?> importht002() {
-        Log.info("--------- START ---------- ::" + System.currentTimeMillis());
+        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<FbkFilesInfo> ht002Files = new ArrayList<>();
         String directory = fbkConfig.getFbkPath();
         List<Map<String, FbkFilesInfo>> fbkFiles = fbkFilesService.getFbkFiles(directory);
@@ -129,7 +132,7 @@ public class FbkController {
         if (ht002Files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        Log.info("--------- END ---------- ::" + System.currentTimeMillis());
+        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(ht002Files, HttpStatus.OK);
     }
 
@@ -168,9 +171,18 @@ public class FbkController {
         return totalFiles;
     }
 
-
     @Scheduled(fixedRate = 2000)
     public void scheduleFbkFiles() {
+        // get Files from SFTP
+        SftpUtils sftpUtils = new SftpUtils();
+        String SFTPHOST = fbkConfig.getSftphost();
+        String SFTPPORT = fbkConfig.getSftpport();
+        String SFTPUSER = fbkConfig.getSftuser();
+        String SFTPPASS = fbkConfig.getSftpassword();
+        String SFTPWORKINGDIR = fbkConfig.getFbkPath();
+        sftpUtils.getFilesSftp(SFTPHOST, SFTPPORT, SFTPUSER, SFTPPASS, SFTPWORKINGDIR);
+
+        // Import Process
         List<FbkFilesInfo> rv001Files = new ArrayList<>();
         List<FbkFilesInfo> rv002Files = new ArrayList<>();
         List<FbkFilesInfo> ht002Files = new ArrayList<>();
@@ -187,7 +199,9 @@ public class FbkController {
 
                 // Copy and Delete
                 FileUtils fileUtils = new FileUtils();
-                fileUtils.moveFile(rv001Info.getFullfbkpath(), fbkConfig.getFbkPathBackup() + rv001Info.getFbkname() + ".bak");
+                if(Files.isDirectory(Paths.get(fbkConfig.getFbkPathBackup()))){
+                    fileUtils.moveFile(rv001Info.getFullfbkpath(), fbkConfig.getFbkPathBackup() + rv001Info.getFbkname() + ".bak");
+                }
             }
 
             FbkFilesInfo rv002Info = filesInfoMap.get(FileType.RV002);
@@ -197,7 +211,9 @@ public class FbkController {
 
                 // Copy and Delete
                 FileUtils fileUtils = new FileUtils();
-                fileUtils.moveFile(rv002Info.getFullfbkpath(), fbkConfig.getFbkPathBackup() + rv002Info.getFbkname() + ".bak");
+                if(Files.isDirectory(Paths.get(fbkConfig.getFbkPathBackup()))){
+                    fileUtils.moveFile(rv002Info.getFullfbkpath(), fbkConfig.getFbkPathBackup() + rv002Info.getFbkname() + ".bak");
+                }
             }
 
             FbkFilesInfo ht002Info = filesInfoMap.get(FileType.HT002);
@@ -207,9 +223,10 @@ public class FbkController {
 
                 // Copy and Delete
                 FileUtils fileUtils = new FileUtils();
-                fileUtils.moveFile(ht002Info.getFullfbkpath(), fbkConfig.getFbkPathBackup() + ht002Info.getFbkname() + ".bak");
+                if(Files.isDirectory(Paths.get(fbkConfig.getFbkPathBackup()))) {
+                    fileUtils.moveFile(ht002Info.getFullfbkpath(), fbkConfig.getFbkPathBackup() + ht002Info.getFbkname() + ".bak");
+                }
             }
         }
     }
-
 }

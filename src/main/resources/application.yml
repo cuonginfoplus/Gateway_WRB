@@ -1,10 +1,17 @@
+server:
+  host: 118.70.245.193
+  port: 22
+  user: info_woori
+  password: Info!@34
+
 path:
-  fbk: /Users/macos/Downloads/FBK_example_files/test_file
-  fbkbackup: /Users/macos/Downloads/FBK_example_files/test_file/Complete/
+  fbk: /root/WRB_Gateway/
+  fbkbackup: /root/WRB_Gateway/Complete/
   file:
     type: .dat
     header_snd: fbk_snd
     header_vir: fbk_vir
+
 
 rv001:
   length:

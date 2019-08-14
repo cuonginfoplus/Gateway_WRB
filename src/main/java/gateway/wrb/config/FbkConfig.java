@@ -22,4 +22,16 @@ public class FbkConfig {
     @Value("${path.file.header_vir}")
     private String headerVir;
 
+    @Value("${server.host}")
+    private String sftphost;
+
+    @Value("${server.port}")
+    private String sftpport;
+
+    @Value("${server.user}")
+    private String sftuser;
+
+    @Value("${server.password}")
+    private String sftpassword;
+
 }

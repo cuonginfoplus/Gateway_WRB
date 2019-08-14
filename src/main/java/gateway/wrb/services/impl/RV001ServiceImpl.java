@@ -9,6 +9,8 @@ import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.RV001Repo;
 import gateway.wrb.services.FbkFilesService;
 import gateway.wrb.services.RV001Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ import java.util.stream.Stream;
 
 @Service
 public class RV001ServiceImpl implements RV001Service {
+    public static final Logger logger = LoggerFactory.getLogger(RV001ServiceImpl.class);
     @Autowired
     private FbkFilesRepo fbkFilesRepo;
     @Autowired
@@ -90,6 +93,8 @@ public class RV001ServiceImpl implements RV001Service {
 
         try (Stream<String> stream = Files.lines(Paths.get(fbkFilesInfo.getFullfbkpath()))) {
             stream.forEach(line -> {
+                try{
+
                 if (line.startsWith(FileType.PREFIX_START)){
                     String msgDscdS = line.substring(0, msgDscdLength);
                     line = line.substring(msgDscdLength);
@@ -109,7 +114,7 @@ public class RV001ServiceImpl implements RV001Service {
                     fbkFilesInfo.setRecmsgcds(recMsgcd);
                     fbkFilesInfo.setTmsdts(tmsDt);
                     fbkFilesInfo.setTmstms(tmsTm);
-                    fbkFilesRepo.addFbkFile(fbkFilesInfo);
+
                 } else if (line.startsWith(FileType.PREFIX_CONTENT)) {
 
                     String msgDscd = line.substring(0, msgDscdLength);
@@ -189,7 +194,13 @@ public class RV001ServiceImpl implements RV001Service {
                     rv001Info.setStsdscd(stsDscd);
                     rv001Repo.addRV001(rv001Info);
                 }
+
+                } catch (Exception e){
+                    e.printStackTrace();
+                    logger.error(e.getMessage());
+                }
             });
+            fbkFilesRepo.addFbkFile(fbkFilesInfo);
         } catch (IOException e) {
             e.printStackTrace();
         }
