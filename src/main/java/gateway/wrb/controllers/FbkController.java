@@ -3,6 +3,7 @@ package gateway.wrb.controllers;
 import gateway.wrb.config.FbkConfig;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
+import gateway.wrb.domain.RV001Info;
 import gateway.wrb.services.FbkFilesService;
 import gateway.wrb.services.HT002Service;
 import gateway.wrb.services.RV001Service;
@@ -20,6 +21,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -47,6 +49,11 @@ public class FbkController {
     @Autowired
     private FbkConfig fbkConfig;
 
+    @GetMapping(value = "/test")
+    public ResponseEntity<?> testAPI() {
+        return new ResponseEntity<>("OK", HttpStatus.OK);
+    }
+
     @GetMapping(value = "/all")
     public ResponseEntity<?> readFiles() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
@@ -56,6 +63,15 @@ public class FbkController {
         }
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(fbkList, HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/info")
+    public ResponseEntity<?> getViracno(@RequestParam("viracno") String viracno) {
+        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+        List<RV001Info> rv001InfoList = rv001Service.getRV001(viracno);
+        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
+        return new ResponseEntity<>(rv001InfoList, HttpStatus.OK);
     }
 
     @GetMapping(value = "/rv001")
@@ -171,7 +187,6 @@ public class FbkController {
         return totalFiles;
     }
 
-    @Scheduled(fixedRate = 2000)
     public void scheduleFbkFiles() {
         // get Files from SFTP
         SftpUtils sftpUtils = new SftpUtils();

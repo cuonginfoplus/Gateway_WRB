@@ -23,9 +23,9 @@ public class RV001RepoImpl implements RV001Repo {
     }
 
     @Override
-    public RV001Info getRV001byID(long id) {
-        RV001Info obj = entityManager.find(RV001Info.class, id);
-        return obj;
+    public List<RV001Info> getRV001byViracno(String viracno) {
+        String hql = "FROM RV001Info as u WHERE u.rcvviracno = '"+viracno+"'  ORDER BY u.id";
+        return entityManager.createQuery(hql).getResultList();
     }
 
     @Override
@@ -39,8 +39,8 @@ public class RV001RepoImpl implements RV001Repo {
     }
 
     @Override
-    public void deleteRV001(long id) {
-        entityManager.detach(getRV001byID(id));
+    public void deleteRV001(String viracno) {
+        entityManager.detach(getRV001byViracno(viracno));
     }
 
     @Override

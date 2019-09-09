@@ -18,6 +18,7 @@ public class SftpUtils {
         Channel channel = null;
         ChannelSftp channelSftp = null;
         try {
+            System.out.println("------------- Get Files SFTP --------------");
             JSch jsch = new JSch();
             session = jsch.getSession(SFTPUSER, SFTPHOST, Integer.parseInt(SFTPPORT));
             session.setPassword(SFTPPASS);
@@ -34,9 +35,10 @@ public class SftpUtils {
                 System.out.println(filelist.get(i).toString());
                 logger.info(filelist.get(i).toString());
             }
+            System.out.println("------------- End Files SFTP --------------");
         } catch (Exception ex) {
             ex.printStackTrace();
-            logger.error(ex.getMessage());
+            logger.error("SFTP : "+ex.getMessage());
         }
     }
 }

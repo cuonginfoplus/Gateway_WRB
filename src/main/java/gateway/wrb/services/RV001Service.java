@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface RV001Service {
     List<RV001Info> getAllRV001();
-    RV001Info getRV001(long id);
+    List<RV001Info> getRV001(String viracno);
     void importRV001(FbkFilesInfo fbkFilesInfo);
     void updateRV001(RV001Info rv001Info);
-    void deleteRV001(long userId);
+    void deleteRV001(String viracno);
     boolean isRV001exist(RV001Info rv001Info);
 }

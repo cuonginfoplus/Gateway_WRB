@@ -40,9 +40,9 @@ public class RV001ServiceImpl implements RV001Service {
     }
 
     @Override
-    public RV001Info getRV001(long id) {
-        RV001Info obj = rv001Repo.getRV001byID(id);
-        return obj;
+    public List<RV001Info> getRV001(String viracno) {
+        List<RV001Info> objList = rv001Repo.getRV001byViracno(viracno);
+        return objList;
     }
 
     @Override
@@ -51,8 +51,8 @@ public class RV001ServiceImpl implements RV001Service {
     }
 
     @Override
-    public void deleteRV001(long userId) {
-        rv001Repo.deleteRV001(userId);
+    public void deleteRV001(String viracno) {
+        rv001Repo.deleteRV001(viracno);
     }
 
     @Override
