@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
@@ -12,8 +13,13 @@ import java.io.Serializable;
 @Table(name="fbkfiles")
 @Data
 public class FbkFilesInfo implements Serializable {
-    @Id
-    @GeneratedValue
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long fbkid;
     private String fbkname;
     private String fullfbkpath;
@@ -26,4 +32,8 @@ public class FbkFilesInfo implements Serializable {
     private String tmsdts;
     private String tmstms;
     private String apldscd;
+    
+    
+    private String other;	//20190909 anhtn ER001 file
+
 }

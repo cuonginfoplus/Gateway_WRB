@@ -148,4 +148,9 @@ public class DateUtils {
         df.setTimeZone(TimeZone.getTimeZone(timezone));
         return df.format(date);
     }
+    
+    public static String getDateFormat(Date date, String format) {
+		SimpleDateFormat formatter = new SimpleDateFormat(format);
+		return formatter.format(date);
+	}
 }

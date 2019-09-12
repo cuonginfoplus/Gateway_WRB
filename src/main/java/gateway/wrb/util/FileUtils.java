@@ -1,6 +1,8 @@
 package gateway.wrb.util;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -46,6 +48,22 @@ public class FileUtils {
         }catch(IOException e){
             e.printStackTrace();
         }
+    }
+    
+    public void createFile(String dir, List<String> content) {
+    	 Charset utf8 = StandardCharsets.UTF_8;
+    	 try (Writer writer = new BufferedWriter(
+                 new OutputStreamWriter(new FileOutputStream(dir), utf8)
+         )) {
+    		 writer.write(content + "\n");
+
+             for (String s : content) {
+                 writer.write(s + "\n");
+             }
+
+         } catch (IOException e) {
+             System.err.format("IOException: %s%n", e);        
+    	 }
     }
 
 }
