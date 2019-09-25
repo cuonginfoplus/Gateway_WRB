@@ -24,7 +24,7 @@ public class RV001RepoImpl implements RV001Repo {
 
     @Override
     public List<RV001Info> getRV001byViracno(String viracno) {
-        String hql = "FROM RV001Info as u WHERE u.rcvviracno = '"+viracno+"'  ORDER BY u.id";
+        String hql = "FROM RV001Info as u WHERE u.rcvviracno = '" + viracno + "'  ORDER BY u.id";
         return entityManager.createQuery(hql).getResultList();
     }
 

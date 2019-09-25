@@ -33,11 +33,11 @@ public class FbkConfig {
 
     @Value("${server.password}")
     private String sftpassword;
-    
+
     //anhtn 20190911
     @Value("${path.file.header_awa}")
     private String headerAwa;
-    
+
     @Value("${path.fbksend}")
     private String fbkSend;
     //end

@@ -63,7 +63,7 @@ public class RV002ServiceImpl implements RV002Service {
         try (Stream<String> stream = Files.lines(Paths.get(fbkFilesInfo.getFullfbkpath()))) {
             stream.forEach(line -> {
                 try {
-                    if(line.startsWith(FileType.PREFIX_START)){
+                    if (line.startsWith(FileType.PREFIX_START)) {
                         String msgDscd = line.substring(0, msgDscdLength);
                         line = line.substring(msgDscdLength);
                         String coNo = line.substring(0, coNoLength);
@@ -105,7 +105,7 @@ public class RV002ServiceImpl implements RV002Service {
                         line = line.substring(fillerLength);
 
                         System.out.println("rv002Path : [" + fbkFilesInfo.getFullfbkpath() + ", outActNo :" + outActNo + ", virActNo:" + virActNo + ", virAcNm :" + virAcNm + ", refNo :" + refNo + ", recCodCd:" + recCodCd + ", trnAm:" + trnAm
-                                + ", trnAvlSdt:" + trnAvlSdt + ", trnAvlEdt:" + trnAvlEdt + ", trnAvlStm:" + trnAvlStm + ", trnAvlEtm:" + trnAvlEtm + ", trnAvlYn:" + trnAvlYn + ", corpRecCompCode:" + corpRecCompCode + ", filter:" + filler +"]");
+                                + ", trnAvlSdt:" + trnAvlSdt + ", trnAvlEdt:" + trnAvlEdt + ", trnAvlStm:" + trnAvlStm + ", trnAvlEtm:" + trnAvlEtm + ", trnAvlYn:" + trnAvlYn + ", corpRecCompCode:" + corpRecCompCode + ", filter:" + filler + "]");
 
                         // save to DB
                         RV002Info rv002Info = new RV002Info();

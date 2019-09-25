@@ -1,9 +1,7 @@
 package gateway.wrb.repositories.impl;
 
 import gateway.wrb.domain.HT002Info;
-import gateway.wrb.domain.RV002Info;
 import gateway.wrb.repositories.HT002Repo;
-import gateway.wrb.repositories.RV002Repo;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

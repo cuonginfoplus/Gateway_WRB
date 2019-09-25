@@ -1,7 +1,6 @@
 package gateway.wrb.config;
 
 import lombok.Getter;
-import org.omg.CORBA.INTERNAL;
 import org.springframework.beans.factory.annotation.Value;
 
 @org.springframework.context.annotation.Configuration

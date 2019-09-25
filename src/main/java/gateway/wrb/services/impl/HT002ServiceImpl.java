@@ -2,7 +2,6 @@ package gateway.wrb.services.impl;
 
 import gateway.wrb.config.HT002Config;
 import gateway.wrb.constant.FileType;
-import gateway.wrb.controllers.FbkController;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.HT002Info;
 import gateway.wrb.repositories.FbkFilesRepo;
@@ -163,7 +162,7 @@ public class HT002ServiceImpl implements HT002Service {
                         ht002Info.setViractno(virActNo);
                         ht002Repo.addHT002(ht002Info);
                     }
-                } catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     logger.error(e.getMessage());
                 }

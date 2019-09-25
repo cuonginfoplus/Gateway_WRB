@@ -13,7 +13,7 @@ import java.util.Vector;
 public class SftpUtils {
     public static final Logger logger = LoggerFactory.getLogger(FbkController.class);
 
-    public void getFilesSftp(String SFTPHOST, String SFTPPORT, String SFTPUSER, String SFTPPASS, String SFTPWORKINGDIR){
+    public void getFilesSftp(String SFTPHOST, String SFTPPORT, String SFTPUSER, String SFTPPASS, String SFTPWORKINGDIR) {
         Session session = null;
         Channel channel = null;
         ChannelSftp channelSftp = null;
@@ -25,7 +25,7 @@ public class SftpUtils {
             java.util.Properties config = new java.util.Properties();
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
-            session.connect();
+            session.connect(60000);
             channel = session.openChannel("sftp");
             channel.connect();
             channelSftp = (ChannelSftp) channel;
@@ -38,7 +38,7 @@ public class SftpUtils {
             System.out.println("------------- End Files SFTP --------------");
         } catch (Exception ex) {
             ex.printStackTrace();
-            logger.error("SFTP : "+ex.getMessage());
+            logger.error("SFTP : " + ex.getMessage());
         }
     }
 }

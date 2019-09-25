@@ -1,12 +1,11 @@
 package gateway.wrb.repositories;
 
-import javax.transaction.Transactional;
-
+import gateway.wrb.domain.PR001EInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import gateway.wrb.domain.PR001EInfo;
+import javax.transaction.Transactional;
 
 @Transactional
-public interface PR001ERepo extends JpaRepository<PR001EInfo, Long>{
+public interface PR001ERepo extends JpaRepository<PR001EInfo, Long> {
 
 }

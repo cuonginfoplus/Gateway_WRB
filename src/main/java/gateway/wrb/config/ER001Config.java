@@ -1,14 +1,13 @@
 package gateway.wrb.config;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-
-import lombok.Getter;
 
 @Configuration
 @Getter
 public class ER001Config {
-	@Value("${er001.length.tmsDt}")
+    @Value("${er001.length.tmsDt}")
     private Integer tmsDtLength;
     @Value("${er001.length.tmsTm}")
     private Integer tmsTmLength;

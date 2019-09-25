@@ -38,18 +38,18 @@ public class DateUtils {
 
     public static long getTimeCurrentDay(int hour, int minute, int second) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY,hour);
-        calendar.set(Calendar.MINUTE,minute);
-        calendar.set(Calendar.SECOND,second);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, second);
         return calendar.get(Calendar.DAY_OF_MONTH);
     }
 
     public static long nextTimeCurrentDay(Date inputDate, int hour, int minute, int second) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(inputDate);
-        calendar.set(Calendar.HOUR_OF_DAY,hour);
-        calendar.set(Calendar.MINUTE,minute);
-        calendar.set(Calendar.SECOND,second);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, second);
         calendar.add(Calendar.DAY_OF_YEAR, 1);
         return calendar.getTimeInMillis();
     }
@@ -82,7 +82,7 @@ public class DateUtils {
     public static Long parseYyyyMMddHHmmSS(String yyyyMMddHHmmss) {
         DateFormat df = new SimpleDateFormat(DATE_TIME_FORMAT);
         try {
-            Date date =  df.parse(yyyyMMddHHmmss);
+            Date date = df.parse(yyyyMMddHHmmss);
             return date.getTime();
         } catch (ParseException e) {
             //
@@ -91,7 +91,7 @@ public class DateUtils {
     }
 
     public static String formatDateTime(Long time) {
-        if(time == null) {
+        if (time == null) {
             return null;
         }
         Date date = new Date(time);
@@ -100,7 +100,7 @@ public class DateUtils {
     }
 
     public static String formatDate(Long time) {
-        if(time == null) {
+        if (time == null) {
             return null;
         }
 
@@ -140,7 +140,7 @@ public class DateUtils {
     }
 
     public static String formatDateTimeWithTimezone(Long time, String timezone) {
-        if(time == null) {
+        if (time == null) {
             return null;
         }
         Date date = new Date(time);
@@ -148,9 +148,9 @@ public class DateUtils {
         df.setTimeZone(TimeZone.getTimeZone(timezone));
         return df.format(date);
     }
-    
+
     public static String getDateFormat(Date date, String format) {
-		SimpleDateFormat formatter = new SimpleDateFormat(format);
-		return formatter.format(date);
-	}
+        SimpleDateFormat formatter = new SimpleDateFormat(format);
+        return formatter.format(date);
+    }
 }

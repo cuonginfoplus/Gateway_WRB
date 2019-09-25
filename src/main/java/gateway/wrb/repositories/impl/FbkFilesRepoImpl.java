@@ -47,8 +47,11 @@ public class FbkFilesRepoImpl implements FbkFilesRepo {
     }
 
     @Override
-    public boolean isRV001Exist(String id, String fileName, String dateTime) {
-        return false;
+    public boolean isFileExist(FbkFilesInfo fbkFilesInfo) {
+        String hql = "FROM FbkFilesInfo WHERE fbkname=:fbkname";
+        int count = entityManager.createQuery(hql).setParameter("fbkname", fbkFilesInfo.getFbkname())
+                .getResultList().size();
+        return count > 0 ? true : false;
     }
 }
 

@@ -9,8 +9,8 @@ public class Validator {
     }
 
     public static boolean validateStrings(String... args) {
-        for (int i = 0; i < args.length ; i++) {
-            if(!validateString(args[i])) {
+        for (int i = 0; i < args.length; i++) {
+            if (!validateString(args[i])) {
                 return false;
             }
         }
@@ -26,8 +26,8 @@ public class Validator {
     }
 
     public static boolean validateObjects(Object... args) {
-        for (int i = 0; i < args.length ; i++) {
-            if(!validateObject(args[i])) {
+        for (int i = 0; i < args.length; i++) {
+            if (!validateObject(args[i])) {
                 return false;
             }
         }

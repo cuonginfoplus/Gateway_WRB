@@ -5,18 +5,14 @@ server:
   password: Info!@34
 
 path:
-  fbk: /Users/macos/Downloads/FBK_example_files/test_file/
-  fbkbackup: /Users/macos/Downloads/FBK_example_files/test_file/Complete/
-  fbksend: /Users/macos/Downloads/FBK_example_files/test_file/Send/
-#  fbk: E:\AUTO_PAY\test_file\test_file
-#  fbkbackup: E:\AUTO_PAY\test_file\test_file\Complete\
-#  fbksend: E:\AUTO_PAY\test_file\test_file\Send\
+  fbk: /Users/macos/Downloads/FBK_files_exam/test_file/
+  fbkbackup: /Users/macos/Downloads/FBK_files_exam/test_file/Complete/
+  fbksend: /Users/macos/Downloads/FBK_files_exam/test_file/Send/
   file:
     type: .dat
     header_snd: fbk_snd
     header_vir: fbk_vir
     header_awa: fbk_awa
-
 
 rv001:
   length:
@@ -94,7 +90,7 @@ ht002:
     depRmk: 210
     trmPrcSrno: 7
     virActNo: 25
-   
+
 er001:
   length:
     tmsDt: 8
@@ -114,7 +110,7 @@ er001:
     orderDscd: 2
     status: 5
     filler: 583
-    
+
 pr001:
   length:
     coNo: 9
@@ -141,13 +137,13 @@ pr001:
     rcvbk2Cd: 8
     regModCd: 1
     trnStat: 5
-    norTranCnt: 9 
+    norTranCnt: 9
     norTranTotAmt: 23
     canTranCnt: 9
     canTranTotAmt: 23
     procTranTotCnt: 9
     procTransTotAmt: 23
-    
+
 vlr001:
   length:
     tmsDt: 8
@@ -175,7 +171,7 @@ vlr001:
     stsDscd: 2
     filler: 424
     lineFlag: 1
-    
+
 ra001:
   length:
     tmsDt: 8
@@ -197,10 +193,7 @@ ra001:
     rcpCnt: 5
     outParticular: 210
     inParticular: 210
-    cus_id_no_cd : 2
+    cus_id_no_cd: 2
     cus_id_no: 50
     isuDt: 8
     vld_edt: 8 
-
-
-
