@@ -10,7 +10,7 @@ public interface VLR001Service {
 
     List<VLR001Info> getAllVLR001();
 
-    VLR001Info getVLR001(long id);
+    List<VLR001Info> getVLR001(String orgCd, String bankCd, String bankCoNo, String outActNo, String rgsTrnSdt, String rgsTrnEdt);
 
     void updateVLR001(VLR001Info info);
 

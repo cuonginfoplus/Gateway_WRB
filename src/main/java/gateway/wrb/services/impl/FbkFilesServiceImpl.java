@@ -33,7 +33,7 @@ public class FbkFilesServiceImpl implements FbkFilesService {
             fbkFilesInfo.setFullfbkpath(fullFileName);
             String fileName = fullFileName.substring(fullFileName.lastIndexOf('/') + 1);
             //String fileName = fullFileName.substring(fullFileName.lastIndexOf('\\') + 1);
-            if (fileName.startsWith(fbkConfig.getHeaderSnd()) && fileName.endsWith(fbkConfig.getFbkType())) {
+            if ((fileName.startsWith(fbkConfig.getHeaderSnd())) && fileName.endsWith(fbkConfig.getFbkType())) {
                 fbkFilesInfo.setFbkname(fileName);
                 String dateTime = convertDateTime(fileName);
 
@@ -59,20 +59,24 @@ public class FbkFilesServiceImpl implements FbkFilesService {
                 fbkFilesInfo.setFbkname(fileName);
                 String dateTime = fileName.substring(12, 20);
                 fbkFilesInfo.setTrndt(dateTime);
+                boolean isFileType = false;
 
                 if (fileName.toUpperCase().contains(FileType.VIR001)) {
                     fbkFilesInfo.setFiletype(FileType.VIR001);
-                } else {
+                    isFileType = true;
+                } else if (fileName.toUpperCase().contains(FileType.RV002)) {
                     fbkFilesInfo.setFiletype(FileType.RV002);
+                    isFileType =true;
                 }
 
                 // saving to DB
                 // fbkFilesRepo.addFbkFile(fbkFilesInfo);
-
-                // add to list FBK
-                Map<String, FbkFilesInfo> fbkFilesInfoMap = new HashMap<>();
-                fbkFilesInfoMap.put(fbkFilesInfo.getFiletype(), fbkFilesInfo);
-                listFbkFiles.add(fbkFilesInfoMap);
+                if (isFileType){
+                    // add to list FBK
+                    Map<String, FbkFilesInfo> fbkFilesInfoMap = new HashMap<>();
+                    fbkFilesInfoMap.put(fbkFilesInfo.getFiletype(), fbkFilesInfo);
+                    listFbkFiles.add(fbkFilesInfoMap);
+                }
             } else if (fileName.startsWith(fbkConfig.getHeaderAwa()) && fileName.endsWith(fbkConfig.getFbkType())) {
                 fbkFilesInfo.setFbkname(fileName);
                 String dateTime = fileName.substring(12, 20);

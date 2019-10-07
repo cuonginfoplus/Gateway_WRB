@@ -3,13 +3,16 @@ package gateway.wrb.services;
 
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.RV001Info;
+import gateway.wrb.domain.RV001Info_Resp;
 
 import java.util.List;
 
 public interface RV001Service {
     List<RV001Info> getAllRV001();
 
-    List<RV001Info> getRV001(String viracno);
+    List<RV001Info> getRV001(String orgCd, String bankCd, String bankCoNo, String outActNo, String rgsTrnSdt, String rgsTrnEdt);
+
+    List<RV001Info_Resp> getRV001Resp(String orgCd, String bankCd, String bankCoNo, String outActNo, String rgsTrnSdt, String rgsTrnEdt);
 
     void importRV001(FbkFilesInfo fbkFilesInfo);
 

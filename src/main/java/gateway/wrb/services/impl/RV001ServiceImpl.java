@@ -5,6 +5,7 @@ import gateway.wrb.config.RV001Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.RV001Info;
+import gateway.wrb.domain.RV001Info_Resp;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.RV001Repo;
 import gateway.wrb.services.FbkFilesService;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -40,9 +42,32 @@ public class RV001ServiceImpl implements RV001Service {
     }
 
     @Override
-    public List<RV001Info> getRV001(String viracno) {
-        List<RV001Info> objList = rv001Repo.getRV001byViracno(viracno);
+    public List<RV001Info> getRV001(String orgCd, String bankCd, String bankCoNo, String outActNo, String rgsTrnSdt, String rgsTrnEdt) {
+        List<RV001Info> objList = rv001Repo.filterRV001(orgCd, bankCd, bankCoNo, outActNo, rgsTrnSdt, rgsTrnEdt);
         return objList;
+    }
+
+
+    @Override
+    public List<RV001Info_Resp> getRV001Resp(String orgCd, String bankCd, String bankCoNo, String outActNo, String rgsTrnSdt, String rgsTrnEdt) {
+        List<RV001Info> rv001InfoList = rv001Repo.filterRV001(orgCd, bankCd, bankCoNo, outActNo, rgsTrnSdt, rgsTrnEdt);
+        List<RV001Info_Resp> rv001InfoRespList = new ArrayList<>();
+        for (int i = 0; i < rv001InfoList.size(); i++){
+            RV001Info rv001Info = rv001InfoList.get(i);
+            RV001Info_Resp rv001Info_resp = new RV001Info_Resp();
+            rv001Info_resp.setVirActNo(rv001Info.getRcvviracno());
+            rv001Info_resp.setVractCusNm(rv001Info.getVractcusnm());
+            rv001Info_resp.setTrnAvlSdt(rv001Info.getTrndt());
+            rv001Info_resp.setTrnAvlEdt("20190620");
+            rv001Info_resp.setTrnAvlStm(rv001Info.getTrntm());
+            rv001Info_resp.setTrnAvlEtm("142257");
+            rv001Info_resp.setRgsTrnDt("20190620");
+            rv001Info_resp.setBankRcvDt("20190620");
+            rv001Info_resp.setBankRcvTm("142257");
+            rv001InfoRespList.add(rv001Info_resp);
+        }
+
+        return rv001InfoRespList;
     }
 
     @Override
@@ -52,7 +77,6 @@ public class RV001ServiceImpl implements RV001Service {
 
     @Override
     public void deleteRV001(String viracno) {
-        rv001Repo.deleteRV001(viracno);
     }
 
     @Override

@@ -4,6 +4,8 @@ import gateway.wrb.config.FbkConfig;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.RV001Info;
+import gateway.wrb.domain.RV001Info_Resp;
+import gateway.wrb.domain.VLR001Info;
 import gateway.wrb.model.RA001Model;
 import gateway.wrb.services.*;
 import gateway.wrb.util.FileUtils;
@@ -15,12 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +64,6 @@ public class FbkController {
     @GetMapping(value = "/all")
     public ResponseEntity<?> readFiles() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
-        //List<FbkFilesInfo> fbkList = importFiles();
         List<FbkFilesInfo> fbkList = new ArrayList<>();
         if (fbkList.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -75,11 +73,35 @@ public class FbkController {
     }
 
     @GetMapping(value = "/info")
-    public ResponseEntity<?> getViracno(@RequestParam("viracno") String viracno) {
+    public ResponseEntity<?> searchInfo(
+            @RequestParam("orgCd") String orgCd,
+            @RequestParam("bankCd") String bankCd,
+            @RequestParam("bankCoNo") String bankCoNo,
+            @RequestParam("outActNo") String outActNo,
+            @RequestParam("rgsTrnSdt") String rgsTrnSdt,
+            @RequestParam("rgsTrnEdt") String rgsTrnEdt
+    ) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
-        List<RV001Info> rv001InfoList = rv001Service.getRV001(viracno);
+        //List<RV001Info> rv001InfoList = rv001Service.getRV001(orgCd, bankCd, bankCoNo, outActNo, rgsTrnSdt, rgsTrnEdt);
+        List<RV001Info_Resp> rv001InfoList = rv001Service.getRV001Resp(orgCd, bankCd, bankCoNo, outActNo, rgsTrnSdt, rgsTrnEdt);
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(rv001InfoList, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/getRV001")
+    public ResponseEntity<?> getVLR001(
+            @RequestParam("orgCd") String orgCd,
+            @RequestParam("bankCd") String bankCd,
+            @RequestParam("bankCoNo") String bankCoNo,
+            @RequestParam("outActNo") String outActNo,
+            @RequestParam("rgsTrnSdt") String rgsTrnSdt,
+            @RequestParam("rgsTrnEdt") String rgsTrnEdt
+    ) {
+        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+        //List<RV001Info> rv001InfoList = rv001Service.getRV001(orgCd, bankCd, bankCoNo, outActNo, rgsTrnSdt, rgsTrnEdt);
+        List<VLR001Info> vlr001InfoList = vlr001Service.getVLR001(orgCd, bankCd, bankCoNo, outActNo, rgsTrnSdt, rgsTrnEdt);
+        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
+        return new ResponseEntity<>(vlr001InfoList, HttpStatus.OK);
     }
 
     @GetMapping(value = "/rv001")
@@ -292,17 +314,13 @@ public class FbkController {
         for (int i = 0; i < fbkFiles.size(); i++) {
             Map<String, FbkFilesInfo> filesInfoMap = fbkFiles.get(i);
             FbkFilesInfo info = filesInfoMap.get(FileType.RA001);
-            if (Validator.validateObject(info)) {
-                // check exist
-                if (!fbkFilesService.isFbkFileExist(info)) {
-                    ra001Service.importRA001(info);
-                    ra001Files.add(info);
+            if (Validator.validateObject(info) && !fbkFilesService.isFbkFileExist(info)) {
+                ra001Service.importRA001(info);
+                ra001Files.add(info);
 
-                    // Copy and Delete
-                    FileUtils fileUtils = new FileUtils();
-                    fileUtils.moveFile(info.getFullfbkpath(), fbkConfig.getFbkPathBackup(), info.getFbkname());
-                }
-
+                // Copy and Delete
+                FileUtils fileUtils = new FileUtils();
+                fileUtils.moveFile(info.getFullfbkpath(), fbkConfig.getFbkPathBackup(), info.getFbkname());
             }
         }
 
@@ -335,7 +353,7 @@ public class FbkController {
         return new ResponseEntity<>(ra001Files, HttpStatus.OK);
     }
 
-    @Scheduled(fixedRate = 2000)
+    //@Scheduled(fixedRate = 2000)
     public void scheduleFbkFiles() {
         // get Files from SFTP
         SftpUtils sftpUtils = new SftpUtils();

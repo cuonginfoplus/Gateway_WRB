@@ -3,6 +3,7 @@ package gateway.wrb.services.impl;
 import gateway.wrb.config.VLR001Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
+import gateway.wrb.domain.RV001Info;
 import gateway.wrb.domain.VLR001Info;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.VLR001Repo;
@@ -164,7 +165,7 @@ public class VLR001ServiceImpl implements VLR001Service {
                         info.setLineFlag(lineFlag);
 
                         if (!isVLR001exist(info))
-                            vlr001Repo.save(info);
+                            vlr001Repo.addVLR001(info);
 
                     }
                 } catch (Exception e) {
@@ -185,9 +186,9 @@ public class VLR001ServiceImpl implements VLR001Service {
     }
 
     @Override
-    public VLR001Info getVLR001(long id) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<VLR001Info> getVLR001(String orgCd, String bankCd, String bankCoNo, String outActNo, String rgsTrnSdt, String rgsTrnEdt) {
+        List<VLR001Info> rv001InfoList = vlr001Repo.filterVLRV001(orgCd, bankCd, bankCoNo, outActNo, rgsTrnSdt, rgsTrnEdt);
+        return rv001InfoList;
     }
 
     @Override
@@ -205,7 +206,7 @@ public class VLR001ServiceImpl implements VLR001Service {
     @Override
     public boolean isVLR001exist(VLR001Info info) {
         try {
-            Integer countEntity = vlr001Repo.countItem(info.getMsgdscd(), info.getVirActNo()
+            Integer countEntity = vlr001Repo.isVLR001exist(info.getMsgdscd(), info.getVirActNo()
                     , info.getAplDscd(), info.getTrnAvlSdt()
                     , info.getTrnAvlEdt(), info.getTrnAvlStm()
                     , info.getTrnAvlEtm(), info.getRgsTrnDt()
