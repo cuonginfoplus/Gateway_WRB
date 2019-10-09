@@ -10,9 +10,9 @@ path:
   fbksend: /Users/macos/Downloads/FBK_files_exam/test_file/Send/
   file:
     type: .dat
-    header_snd: FBK_SND
-    header_vir: FBK_VIR
-    header_awa: FBK_AWA
+    header_snd: fbk_snd
+    header_vir: fbk_vir
+    header_awa: fbk_awa
 
 rv001:
   length:

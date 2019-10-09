@@ -1,12 +1,15 @@
 package gateway.wrb.repositories.impl;
 
 import gateway.wrb.domain.HT002Info;
+import gateway.wrb.domain.VLR001Info;
 import gateway.wrb.repositories.HT002Repo;
+import gateway.wrb.util.Validator;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -22,8 +25,16 @@ public class HT002RepoImpl implements HT002Repo {
     }
 
     @Override
-    public HT002Info getHT002byID(long id) {
-        return null;
+    public List<HT002Info> filterHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt) {
+        List<HT002Info> ht002InfoList = new ArrayList<>();
+        if (Validator.validateStrings(orgCd, bankCd, bankCoNo, outActNo)) {
+            String hql = "FROM HT002Info WHERE viractno=:viractno ";
+            ht002InfoList = entityManager.createQuery(hql).setParameter("viractno", outActNo).getResultList();
+        } else {
+            String hql = "FROM HT002Info";
+            ht002InfoList = entityManager.createQuery(hql).getResultList();
+        }
+        return ht002InfoList;
     }
 
     @Override

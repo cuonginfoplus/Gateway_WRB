@@ -9,7 +9,7 @@ import java.util.List;
 public interface HT002Service {
     List<HT002Info> getAllHT002();
 
-    HT002Info getHT002(long id);
+    List<HT002Info> getHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt);
 
     void importHT002(FbkFilesInfo fbkFilesInfo);
 

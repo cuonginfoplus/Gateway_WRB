@@ -55,7 +55,7 @@ public class FbkFilesServiceImpl implements FbkFilesService {
                 Map<String, FbkFilesInfo> fbkFilesInfoMap = new HashMap<>();
                 fbkFilesInfoMap.put(fbkFilesInfo.getFiletype(), fbkFilesInfo);
                 listFbkFiles.add(fbkFilesInfoMap);
-            } else if (fileName.toUpperCase().startsWith(fbkConfig.getHeaderVir()) && fileName.endsWith(fbkConfig.getFbkType())) {
+            } else if (fileName.startsWith(fbkConfig.getHeaderVir()) && fileName.endsWith(fbkConfig.getFbkType())) {
                 fbkFilesInfo.setFbkname(fileName);
                 String dateTime = fileName.substring(12, 20);
                 fbkFilesInfo.setTrndt(dateTime);
@@ -64,14 +64,15 @@ public class FbkFilesServiceImpl implements FbkFilesService {
                 if (fileName.toUpperCase().contains(FileType.VIR001)) {
                     fbkFilesInfo.setFiletype(FileType.VIR001);
                     isFileType = true;
-                } else if (fileName.toUpperCase().contains(FileType.RV002)) {
+                } else if (fileName.toUpperCase().contains(FileType.RV002_PREFIX1)
+                        || fileName.toUpperCase().contains(FileType.RV002_PREFIX2)) {
                     fbkFilesInfo.setFiletype(FileType.RV002);
-                    isFileType =true;
+                    isFileType = true;
                 }
 
                 // saving to DB
                 // fbkFilesRepo.addFbkFile(fbkFilesInfo);
-                if (isFileType){
+                if (isFileType) {
                     // add to list FBK
                     Map<String, FbkFilesInfo> fbkFilesInfoMap = new HashMap<>();
                     fbkFilesInfoMap.put(fbkFilesInfo.getFiletype(), fbkFilesInfo);

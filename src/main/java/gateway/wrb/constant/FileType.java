@@ -3,6 +3,8 @@ package gateway.wrb.constant;
 public class FileType {
     public static final String RV001 = "RV001";
     public static final String RV002 = "RV002";
+    public static final String RV002_PREFIX1 = "FBK_VIR_002";
+    public static final String RV002_PREFIX2 = "FBK_VIR_101";
     public static final String HT002 = "HT002";
     public static final String ER001 = "ER001";
     public static final String PR001 = "PR001";

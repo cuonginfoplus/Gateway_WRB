@@ -3,7 +3,6 @@ package gateway.wrb.services.impl;
 import gateway.wrb.config.VLR001Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
-import gateway.wrb.domain.RV001Info;
 import gateway.wrb.domain.VLR001Info;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.VLR001Repo;
