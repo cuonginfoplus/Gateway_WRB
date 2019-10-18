@@ -1,20 +1,15 @@
 package gateway.wrb.repositories;
 
 import gateway.wrb.domain.RA001Info;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
-import javax.transaction.Transactional;
+import java.util.List;
 
-@Transactional
-public interface RA001Repo extends JpaRepository<RA001Info, Long> {
-    @Query("SELECT count(a) FROM RA001Info a where "
-            + " a.msgdscd = :msgdscd and a.wdrActNo = :wdrActNo"
-            + " and a.aplDscd = :aplDscd and a.trnStDt = :trnStDt "
-            + " and a.trnType = :trnType and a.curCd = :curCd"
-            + " and a.cusIdNo = :cusIdNo ")
-    Integer countItem(String msgdscd, String wdrActNo
-            , String aplDscd, String trnStDt
-            , String trnType, String curCd
-            , String cusIdNo);
+public interface RA001Repo {
+    List<RA001Info> filterRA001(String orgCd, String bankCd, String bankCoNo);
+
+    void save(RA001Info info);
+
+    Integer isRA001Exist(String msgdscd, String wdrActNo, String aplDscd, String trnStDt, String trnType, String curCd, String cusIdNo);
+
+    List<RA001Info> filterRA001_2(String orgCd, String bankCd, String bankCoNo, String bankRsvSdt, String bankRsvEdt);
 }

@@ -1,21 +1,16 @@
 package gateway.wrb.repositories;
 
 import gateway.wrb.domain.ER001Info;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.List;
 
-@Transactional
-public interface ER001Repo extends JpaRepository<ER001Info, Long> {
+public interface ER001Repo {
+    void save(ER001Info er001Info);
 
-    @Query("SELECT count(a) FROM ER001Info a where a.msgdscd = :msgdscd and a.noticeDt = :noticeDt"
-            + " and a.noticeCnt = :noticeCnt and a.fromCcy = :fromCcy and a.toCcy = :toCcy"
-            + " and a.baseRate = :baseRate and a.cashBuying = :cashBuying and a.cashSelling = :cashSelling"
-            + " and a.ttBuying = :ttBuying and a.ttSelling = :ttSelling and a.orderDscd = :orderDscd"
-            + " and a.status = :status and a.filler = :filler")
-    Integer countEr001(String msgdscd, String noticeDt, Integer noticeCnt, String fromCcy, String toCcy
+    Integer isER001Exist(String msgdscd, String noticeDt, Integer noticeCnt, String fromCcy, String toCcy
             , BigDecimal baseRate, BigDecimal cashBuying, BigDecimal cashSelling, BigDecimal ttBuying
             , BigDecimal ttSelling, String orderDscd, String status, String filler);
+
+    List<ER001Info> filterER001(String orgCd, String bankCd, String bankCoNo, String noticeSdt, String noticeEdt);
 }

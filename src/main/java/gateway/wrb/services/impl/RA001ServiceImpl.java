@@ -51,9 +51,15 @@ public class RA001ServiceImpl implements RA001Service {
     }
 
     @Override
-    public List<RA001Info> getRA001(String viracno) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<RA001Info> getRA001(String orgCd, String bankCd, String bankCoNo) {
+        List<RA001Info> ra001InfoList = ra001Repo.filterRA001(orgCd, bankCd, bankCoNo);
+        return ra001InfoList;
+    }
+
+    @Override
+    public List<RA001Info> getRA001_2(String orgCd, String bankCd, String bankCoNo, String bankRsvSdt, String bankRsvEdt) {
+        List<RA001Info> ra001InfoList = ra001Repo.filterRA001_2(orgCd, bankCd, bankCoNo, bankRsvSdt, bankRsvEdt);
+        return ra001InfoList;
     }
 
     @Override
@@ -128,7 +134,6 @@ public class RA001ServiceImpl implements RA001Service {
                         String isuDt = line.substring(0, isuDtLength);
                         String vldEdt = line.substring(0, vldEdtLength);
 
-
                         logger.info("ra001Path : [" + fbkFilesInfo.getFullfbkpath()
                                 + ", msgDscd :" + msgDscD + ", wdrActNo:" + wdrActNo
                                 + ", aplDscd :" + aplDscd + ", msgTrno :" + msgTrno
@@ -194,12 +199,11 @@ public class RA001ServiceImpl implements RA001Service {
     @Override
     public boolean isRA001exist(RA001Info info) {
         try {
-            Integer countEntity = ra001Repo.countItem(info.getMsgdscd(), info.getWdrActNo()
+            Integer countEntity = ra001Repo.isRA001Exist(info.getMsgdscd(), info.getWdrActNo()
                     , info.getAplDscd(), info.getTrnStDt()
                     , info.getTrnType(), info.getCurCd()
                     , info.getCusIdNo());
             logger.info("VLR001 " + info.getMsgdscd() + "," + info.getWdrActNo() + " detail has count = " + countEntity);
-
 
             if (countEntity < 1)
                 return false;
@@ -228,6 +232,7 @@ public class RA001ServiceImpl implements RA001Service {
         utils.createFile(path, contents);
 
     }
+
 
     private String createStartContent(RA001Model model) {
         Integer tmsDtLength = ra001Config.getTmsDtLength();

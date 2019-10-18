@@ -2,9 +2,7 @@ package gateway.wrb.controllers;
 
 import gateway.wrb.config.FbkConfig;
 import gateway.wrb.constant.FileType;
-import gateway.wrb.domain.FbkFilesInfo;
-import gateway.wrb.domain.HT002Info;
-import gateway.wrb.domain.VLR001Info;
+import gateway.wrb.domain.*;
 import gateway.wrb.model.RA001Model;
 import gateway.wrb.services.*;
 import gateway.wrb.util.FileUtils;
@@ -93,13 +91,54 @@ public class FbkController {
             @RequestParam("bankCd") String bankCd,
             @RequestParam("bankCoNo") String bankCoNo,
             @RequestParam("outActNo") String outActNo,
+            @RequestParam("InqSdt") String InqSdt,
+            @RequestParam("InqEdt") String InqEdt
+    ) {
+        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+        List<HT002Info> ht002InfoList = ht002Service.getHT002(orgCd, bankCd, bankCoNo, outActNo, InqSdt, InqEdt);
+        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
+        return new ResponseEntity<>(ht002InfoList, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/ra001/info")
+    public ResponseEntity<?> getRA001(
+            @RequestParam("orgCd") String orgCd,
+            @RequestParam("bankCd") String bankCd,
+            @RequestParam("bankCoNo") String bankCoNo
+    ) {
+        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+        List<RA001Info> ra001InfoList = ra001Service.getRA001(orgCd, bankCd, bankCoNo);
+        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
+        return new ResponseEntity<>(ra001InfoList, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/ra001_2/info")
+    public ResponseEntity<?> getRA001_2(
+            @RequestParam("orgCd") String orgCd,
+            @RequestParam("bankCd") String bankCd,
+            @RequestParam("bankCoNo") String bankCoNo,
             @RequestParam("bankRsvSdt") String bankRsvSdt,
             @RequestParam("bankRsvEdt") String bankRsvEdt
     ) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
-        List<HT002Info> ht002InfoList = ht002Service.getHT002(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
+        List<RA001Info> ra001InfoList = ra001Service.getRA001_2(orgCd, bankCd, bankCoNo, bankRsvSdt, bankRsvEdt);
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
-        return new ResponseEntity<>(ht002InfoList, HttpStatus.OK);
+        return new ResponseEntity<>(ra001InfoList, HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/er001/info")
+    public ResponseEntity<?> getER001(
+            @RequestParam("orgCd") String orgCd,
+            @RequestParam("bankCd") String bankCd,
+            @RequestParam("bankCoNo") String bankCoNo,
+            @RequestParam("noticeSdt") String noticeSdt,
+            @RequestParam("noticeEdt") String noticeEdt
+    ) {
+        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+        List<ER001Info> er001Infos = er001Service.getER001(orgCd, bankCd, bankCoNo, noticeSdt, noticeEdt);
+        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
+        return new ResponseEntity<>(er001Infos, HttpStatus.OK);
     }
 
     @GetMapping(value = "/rv001")

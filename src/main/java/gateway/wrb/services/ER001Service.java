@@ -8,7 +8,7 @@ import java.util.List;
 public interface ER001Service {
     List<ER001Info> getAllER001();
 
-    ER001Info getER001(long id);
+    List<ER001Info> getER001(String orgCd, String bankCd, String bankCoNo, String noticeSdt, String noticeEdt);
 
     void importER001(FbkFilesInfo fbkFilesInfo);
 

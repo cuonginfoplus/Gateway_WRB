@@ -4,7 +4,6 @@ import gateway.wrb.config.HT002Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.HT002Info;
-import gateway.wrb.domain.VLR001Info;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.HT002Repo;
 import gateway.wrb.services.HT002Service;
@@ -36,8 +35,8 @@ public class HT002ServiceImpl implements HT002Service {
     }
 
     @Override
-    public List<HT002Info> getHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt) {
-        List<HT002Info> ht002InfoList = ht002Repo.filterHT002(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
+    public List<HT002Info> getHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String InqSdt, String InqEdt) {
+        List<HT002Info> ht002InfoList = ht002Repo.filterHT002(orgCd, bankCd, bankCoNo, outActNo, InqSdt, InqEdt);
         return ht002InfoList;
     }
 

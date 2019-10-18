@@ -1,7 +1,6 @@
 package gateway.wrb.repositories.impl;
 
 import gateway.wrb.domain.HT002Info;
-import gateway.wrb.domain.VLR001Info;
 import gateway.wrb.repositories.HT002Repo;
 import gateway.wrb.util.Validator;
 import org.springframework.stereotype.Repository;
@@ -25,11 +24,11 @@ public class HT002RepoImpl implements HT002Repo {
     }
 
     @Override
-    public List<HT002Info> filterHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt) {
+    public List<HT002Info> filterHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String InqSdt, String InqEdt) {
         List<HT002Info> ht002InfoList = new ArrayList<>();
         if (Validator.validateStrings(orgCd, bankCd, bankCoNo, outActNo)) {
-            String hql = "FROM HT002Info WHERE viractno=:viractno ";
-            ht002InfoList = entityManager.createQuery(hql).setParameter("viractno", outActNo).getResultList();
+            String hql = "FROM HT002Info WHERE actno=:actno ";
+            ht002InfoList = entityManager.createQuery(hql).setParameter("actno", outActNo).getResultList();
         } else {
             String hql = "FROM HT002Info";
             ht002InfoList = entityManager.createQuery(hql).getResultList();

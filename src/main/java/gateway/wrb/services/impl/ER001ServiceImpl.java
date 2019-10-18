@@ -39,9 +39,9 @@ public class ER001ServiceImpl implements ER001Service {
     }
 
     @Override
-    public ER001Info getER001(long id) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<ER001Info> getER001(String orgCd, String bankCd, String bankCoNo, String noticeSdt, String noticeEdt) {
+        List<ER001Info> er001Infos = er001Repo.filterER001(orgCd, bankCd, bankCoNo, noticeSdt, noticeEdt);
+        return er001Infos;
     }
 
     @Override
@@ -175,7 +175,7 @@ public class ER001ServiceImpl implements ER001Service {
 
     private boolean isExisted(ER001Info info) {
         try {
-            Integer countEntity = er001Repo.countEr001(info.getMsgdscd(), info.getNoticeDt(), info.getNoticeCnt(),
+            Integer countEntity = er001Repo.isER001Exist(info.getMsgdscd(), info.getNoticeDt(), info.getNoticeCnt(),
                     info.getFromCcy(), info.getToCcy(), info.getBaseRate(), info.getCashBuying(), info.getCashSelling(),
                     info.getTtBuying(), info.getTtSelling(), info.getOrderDscd(), info.getStatus(), info.getFiller());
             logger.info("ER001 " + info.getMsgdscd() + "," + info.getNoticeDt() + " has count = " + countEntity);
