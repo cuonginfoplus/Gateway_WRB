@@ -37,7 +37,7 @@ public class FileUtils {
                 Files.createDirectories(path);
             }
 
-            File newFile = new File(outputFile + fileName + ".bak");
+            File newFile = new File(outputFile + "\\" + fileName + ".bak");
 
             inStream = new FileInputStream(afile);
             outStream = new FileOutputStream(newFile);

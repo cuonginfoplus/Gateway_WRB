@@ -40,8 +40,8 @@ public class RV001ServiceImpl implements RV001Service {
     }
 
     @Override
-    public List<RV001Info> getRV001(String orgCd, String bankCd, String bankCoNo, String outActNo, String rgsTrnSdt, String rgsTrnEdt) {
-        List<RV001Info> objList = rv001Repo.filterRV001(orgCd, bankCd, bankCoNo, outActNo, rgsTrnSdt, rgsTrnEdt);
+    public List<RV001Info> getRV001(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt) {
+        List<RV001Info> objList = rv001Repo.filterRV001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
         return objList;
     }
 

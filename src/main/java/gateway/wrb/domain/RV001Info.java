@@ -18,14 +18,14 @@ public class RV001Info implements Serializable {
 
     private String fbkname;
     private String msgdscd;
-    private String trndt;
-    private String trntm;
-    private String msgno;
-    private String wdracno;
-    private String wdrviracno;
-    private String rcvacno;
-    private String rcvviracno;
-    private String rcvacdppenm;
+    private String trndt; // transac date
+    private String trntm; //transac time
+    private String msgno; // identify code
+    private String wdracno; // withdaw acc no
+    private String wdrviracno; //wthdraw virtual acc no
+    private String rcvacno; // reiceive acc no (stk nop tien)
+    private String rcvviracno; // receive vir acc no (stk ao nop tien)
+    private String rcvacdppenm; // name of receive (ten nguoi)
     private String curcd;
     private String wdram;
     private String tobkdscd;
