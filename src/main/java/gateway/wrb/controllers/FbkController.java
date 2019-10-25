@@ -4,9 +4,9 @@ import gateway.wrb.config.FbkConfig;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.*;
 import gateway.wrb.model.RA001Model;
+import gateway.wrb.model.RB001Model;
 import gateway.wrb.services.*;
 import gateway.wrb.util.FileUtils;
-import gateway.wrb.util.SftpUtils;
 import gateway.wrb.util.Validator;
 import lombok.extern.log4j.Log4j;
 import org.slf4j.Logger;
@@ -49,6 +49,9 @@ public class FbkController {
 
     @Autowired
     private RA001Service ra001Service;
+
+    @Autowired
+    private RB001Service rb001Service;
 
     @Autowired
     private FbkConfig fbkConfig;
@@ -383,22 +386,41 @@ public class FbkController {
         if (model != null) {
             //create request file
             ra001Service.createRA001Req(sndDir, model);
-            //send to MQ
         }
 
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(ra001Files, HttpStatus.OK);
     }
 
-    //@Scheduled(fixedRate = 2000)
-    public void scheduleFbkFiles() {
-        // get Files from SFTP
-        SftpUtils sftpUtils = new SftpUtils();
-        String SFTPHOST = fbkConfig.getSftphost();
-        String SFTPPORT = fbkConfig.getSftpport();
-        String SFTPUSER = fbkConfig.getSftuser();
-        String SFTPPASS = fbkConfig.getSftpassword();
-        String SFTPWORKINGDIR = fbkConfig.getFbkPath();
-        sftpUtils.getFilesSftp(SFTPHOST, SFTPPORT, SFTPUSER, SFTPPASS, SFTPWORKINGDIR);
+    /**
+     * cuongtm 20191021 post RB001 Request auto transfer
+     *
+     * @param model: RB001Model
+     * @return
+     */
+    @PostMapping(value = "/rb001")
+    public ResponseEntity<?> postRB001(@RequestBody RB001Model model) {
+        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+        List<FbkFilesInfo> rb001Files = new ArrayList<>();
+        String sndDir = fbkConfig.getFbkSend();
+        if (model != null) {
+            //create request file
+            rb001Service.createRB001Req(sndDir, model);
+        }
+        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
+        return new ResponseEntity<>(rb001Files, HttpStatus.OK);
     }
+
+//    @Scheduled(fixedRate = 2000)
+//    public void scheduleFbkFiles() {
+
+//        // get Files from SFTP
+//        SftpUtils sftpUtils = new SftpUtils();
+//        String SFTPHOST = fbkConfig.getSftphost();
+//        String SFTPPORT = fbkConfig.getSftpport();
+//        String SFTPUSER = fbkConfig.getSftuser();
+//        String SFTPPASS = fbkConfig.getSftpassword();
+//        String SFTPWORKINGDIR = fbkConfig.getFbkPath();
+//        sftpUtils.getFilesSftp(SFTPHOST, SFTPPORT, SFTPUSER, SFTPPASS, SFTPWORKINGDIR);
+//    }
 }

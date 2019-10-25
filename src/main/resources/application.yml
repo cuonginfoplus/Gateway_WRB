@@ -5,9 +5,9 @@ server:
   password: Info!@34
 
 path:
-  fbk: /Users/macos/Downloads/FBK_files_exam/test_file/
-  fbkbackup: /Users/macos/Downloads/FBK_files_exam/test_file/Complete/
-  fbksend: /Users/macos/Downloads/FBK_files_exam/test_file/Send/
+  fbk: /root/WRB_Gateway
+  fbkbackup: /root/WRB_Gateway/Complete/
+  fbksend: /root/WRB_Gateway/Send/
   file:
     type: .dat
     header_snd: fbk_snd
@@ -196,4 +196,56 @@ ra001:
     cus_id_no_cd: 2
     cus_id_no: 50
     isuDt: 8
-    vld_edt: 8 
+    vld_edt: 8
+
+rb001:
+  length:
+    s_msgDscd_1: 1
+    s_coNo: 9
+    s_reqDt: 8
+    s_trnDt: 8
+    s_inActNo: 25
+    s_trnDscd: 2
+    s_msgDscd_2: 5
+    s_rqDscd: 1
+    s_multiTrnCd: 1
+    s_feePreOcc: 1
+    s_feeInclYn: 1
+    s_firmSvrSec: 10
+    s_firmSvrSec2: 8
+    s_comfirmDupYn: 1
+    s_filler: 424
+    msgDscd: 1
+    seq: 10
+    outActNo: 25
+    curCd: 3
+    trnAm: 23
+    tobkDscd: 1
+    istDscd: 1
+    inCdAccGb: 1
+    rcvbk1Cd: 11
+    rcvbk2Cd: 11
+    rcvbkNm: 140
+    sndName: 69
+    rcvacDppeNm: 69
+    depRmk: 210
+    wdrRmk: 210
+    trnSrno: 14
+    status: 5
+    prcCd: 2
+    errCd: 8
+    refNo: 100
+    filler: 77
+    e_msgDscd: 1
+    e_totCnt: 7
+    e_totReqCnt: 7
+    e_totReqAmt: 23
+    e_totSucCnt: 7
+    e_totSucAmt: 23
+    e_failCnt: 7
+    e_failAmt: 23
+    e_inSucCnt: 7
+    e_inSucAmt: 23
+    e_outSucCnt: 7
+    e_outSucAmt: 23
+    e_filler: 342

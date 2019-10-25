@@ -25,7 +25,7 @@ public class RV001RepoImpl implements RV001Repo {
     }
 
     @Override
-    public List<RV001Info> filterRV001(String orgCd, String bankCd, String bankCoNo, String outActNo, String rgsTrnSdt, String rgsTrnEdt) {
+    public List<RV001Info> filterRV001(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt) {
         List<RV001Info> rv001InfoList = new ArrayList<>();
         if (Validator.validateStrings(orgCd, bankCd, bankCoNo, outActNo)) {
             String hql = "FROM RV001Info WHERE rcvviracno=:outActNo ";

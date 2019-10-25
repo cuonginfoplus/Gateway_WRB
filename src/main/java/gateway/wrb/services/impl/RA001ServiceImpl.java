@@ -23,6 +23,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -227,7 +229,7 @@ public class RA001ServiceImpl implements RA001Service {
         FileUtils utils = new FileUtils();
         //Request: fbk_awa_099_yyyyMMdd(8 length)_FirmbankingCustomerCode(9 length)_sequenceNumber(3 length).dat(Customer -> WooriBank)
         //ex: fbk_awa_099_20190822_000000098_001.dat
-        String sndFileName = createSndFileName(AppConst.TYPE_RA001_REQ, model.getCoNo());
+        String sndFileName = createSndFileName(AppConst.TYPE_RA001_REQ, model.getOrgCd());
         String path = dir + sndFileName;
         utils.createFile(path, contents);
 
@@ -242,14 +244,18 @@ public class RA001ServiceImpl implements RA001Service {
         Integer dataCntLength = ra001Config.getDataCntLength();
         Integer etcArLength = ra001Config.getEtcLength();
 
+        String strCurrDate = DateUtils.getDateFormat(new Date(), "yyyyMMdd");
+        DateFormat df2 = new SimpleDateFormat("HHmmss");
+        String strCurrHour = df2.format(new Date());
+
         StringBuilder builder = new StringBuilder();
         builder.append("S");
-        builder.append(StringUtils.padLeftSpaces(model.getTmsDt(), tmsDtLength));
-        builder.append(StringUtils.padLeftSpaces(model.getTmsTm(), tmsTmLength));
-        builder.append(StringUtils.padLeftSpaces(model.getCoNo(), coNoLength));
-        builder.append(StringUtils.padLeftSpaces(model.getActNo(), actNoLength));
-        builder.append(StringUtils.padLeftSpaces(model.getDataCnt(), dataCntLength));
-        builder.append(StringUtils.padLeftSpaces(model.getEtcAr(), etcArLength));
+        builder.append(StringUtils.padLeftSpaces(strCurrDate, tmsDtLength));
+        builder.append(StringUtils.padLeftSpaces(strCurrHour, tmsTmLength));
+        builder.append(StringUtils.padLeftSpaces(model.getOrgCd(), coNoLength));
+        builder.append(StringUtils.padLeftSpaces(model.getWdrActNo(), actNoLength));
+        builder.append(StringUtils.padLeftSpaces("1", dataCntLength));
+        builder.append(StringUtils.padLeftSpaces("0", etcArLength));
 
         return builder.toString();
     }
@@ -276,21 +282,21 @@ public class RA001ServiceImpl implements RA001Service {
         builder.append("D");
 
         builder.append(StringUtils.padLeftSpaces(model.getWdrActNo(), wdrActNoLength));
-        builder.append(StringUtils.padLeftSpaces(model.getAplDscd(), aplDscdLength));
+        builder.append(StringUtils.padLeftSpaces("RA001", aplDscdLength));
         builder.append(StringUtils.padLeftSpaces(model.getMsgTrno(), msgTrnoLength));
         builder.append(StringUtils.padLeftSpaces(model.getTrnStDt(), trnStDtLength));
         builder.append(StringUtils.padLeftSpaces(model.getTrnClsDt(), trnClsDtLength));
         builder.append(StringUtils.padLeftSpaces(model.getTrnType(), trnTypeLength));
-        builder.append(StringUtils.padLeftSpaces(model.getStatus(), statusLength));
+        builder.append(StringUtils.padLeftSpaces("", statusLength));
         builder.append(StringUtils.padLeftSpaces(model.getCurCd(), curCdLength));
         builder.append(StringUtils.padLeftSpaces(model.getRcpAm(), rcpAmLength));
         builder.append(StringUtils.padLeftSpaces(model.getRcpCnt(), rcpCntLength));
         builder.append(StringUtils.padLeftSpaces(model.getOutParticular(), outParticularLength));
         builder.append(StringUtils.padLeftSpaces(model.getInParticular(), inParticularLength));
-        builder.append(StringUtils.padLeftSpaces(model.getCusIdNoCd(), cusIdNoCdLength));
-        builder.append(StringUtils.padLeftSpaces(model.getCusIdNo(), cusIdNoLength));
+        builder.append(StringUtils.padLeftSpaces(model.getCus_id_no_cd(), cusIdNoCdLength));
+        builder.append(StringUtils.padLeftSpaces(model.getCus_id_no(), cusIdNoLength));
         builder.append(StringUtils.padLeftSpaces(model.getIsuDt(), isuDtLength));
-        builder.append(StringUtils.padLeftSpaces(model.getVldEdt(), vldEdtLength));
+        builder.append(StringUtils.padLeftSpaces(model.getVld_edt(), vldEdtLength));
         return builder.toString();
     }
 

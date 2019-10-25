@@ -4,27 +4,21 @@ import lombok.Data;
 
 @Data
 public class RA001Model {
-    private String tmsDt;
-    private String tmsTm;
-    private String coNo;
-    private String actNo;
-    private String dataCnt;
-    private String etcAr;
-
+    private String orgCd;
+    private String bankCd;
+    private String bankCoNo;
     private String wdrActNo;
-    private String aplDscd;
     private String msgTrno;
     private String trnStDt;
     private String trnClsDt;
     private String trnType;
-    private String status;
     private String curCd;
     private String rcpAm;
     private String rcpCnt;
     private String outParticular;
     private String inParticular;
-    private String cusIdNoCd;
-    private String cusIdNo;
+    private String cus_id_no_cd;
+    private String cus_id_no;
     private String isuDt;
-    private String vldEdt;
+    private String vld_edt;
 }

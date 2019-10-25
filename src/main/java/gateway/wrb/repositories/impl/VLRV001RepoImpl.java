@@ -27,13 +27,10 @@ public class VLRV001RepoImpl implements VLR001Repo {
     @Override
     public List<VLR001Info> filterVLRV001(String orgCd, String bankCd, String bankCoNo, String outActNo, String rgsTrnSdt, String rgsTrnEdt) {
         List<VLR001Info> vlr001InfoList = new ArrayList<>();
-        if (Validator.validateStrings(orgCd, bankCd, bankCoNo, outActNo)) {
-            String hql = "FROM VLR001Info WHERE virActNo=:virActNo ";
-            vlr001InfoList = entityManager.createQuery(hql).setParameter("virActNo", outActNo).getResultList();
-        } else {
+
             String hql = "FROM VLR001Info";
             vlr001InfoList = entityManager.createQuery(hql).getResultList();
-        }
+
         return vlr001InfoList;
     }
 
