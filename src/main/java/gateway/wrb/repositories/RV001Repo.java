@@ -14,7 +14,7 @@ public interface RV001Repo {
 
     void updateRV001(RV001Info rv001Info);
 
-    void deleteRV001();
+    void deleteRV001(RV001Info rv001Info);
 
     boolean isRV001Exist(String msgDscd, String trnDt, String trnTm, String msgNo, String wrdacNo, String rcvacNo, String amount);
 }

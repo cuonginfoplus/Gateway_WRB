@@ -55,6 +55,8 @@ public class FbkController {
 
     @Autowired
     private FbkConfig fbkConfig;
+    @Autowired
+    private RV001Repo rv001Repo;
 
     @GetMapping(value = "/test")
     public ResponseEntity<?> testAPI() {
@@ -74,18 +76,26 @@ public class FbkController {
 
     @GetMapping(value = "/rv001/info")
     public ResponseEntity<?> getVLR001(
-            @RequestParam("orgCd") String orgCd,
-            @RequestParam("bankCd") String bankCd,
-            @RequestParam("bankCoNo") String bankCoNo,
-            @RequestParam("outActNo") String outActNo,
-            @RequestParam("rgsTrnSdt") String rgsTrnSdt,
-            @RequestParam("rgsTrnEdt") String rgsTrnEdt
+            @RequestParam(value = "orgCd", defaultValue = "") String orgCd,
+            @RequestParam(value = "bankCd", defaultValue = "") String bankCd, //tạm bỏ
+            @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo, //tạm bỏ
+            @RequestParam(value = "outActNo", defaultValue = "") String outActNo,
+            @RequestParam(value = "bankRsvSdt", defaultValue = "") String bankRsvSdt,
+            @RequestParam(value = "bankRsvEdt", defaultValue = "") String bankRsvEdt
     ) {
+        System.out.println("Go into RV001");
+        System.out.println("orgCd: " + orgCd.isEmpty());
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
-        //List<RV001Info> rv001InfoList = rv001Service.getRV001(orgCd, bankCd, bankCoNo, outActNo, rgsTrnSdt, rgsTrnEdt);
-        List<VLR001Info> vlr001InfoList = vlr001Service.getVLR001(orgCd, bankCd, bankCoNo, outActNo, rgsTrnSdt, rgsTrnEdt);
+        List<RV001Info> rv001InfoList = rv001Service.getRV001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
+        //List<VLR001Info> vlr001InfoList = vlr001Service.getVLR001(orgCd, bankCd, bankCoNo, outActNo, rgsTrnSdt, rgsTrnEdt);
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
-        return new ResponseEntity<>(vlr001InfoList, HttpStatus.OK);
+        //return new ResponseEntity<>(vlr001InfoList, HttpStatus.OK);
+        try {
+            System.out.println("Size of RV001 list: " + rv001InfoList.size());
+        } catch (Exception e) {
+
+        }
+        return new ResponseEntity<>(rv001InfoList, HttpStatus.OK);
     }
 
     @GetMapping(value = "/ht002/info")
@@ -111,6 +121,12 @@ public class FbkController {
     ) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<RA001Info> ra001InfoList = ra001Service.getRA001(orgCd, bankCd, bankCoNo);
+
+        try {
+            System.out.println("Size of RA001 list: " + ra001InfoList.size());
+        } catch (Exception e) {
+
+        }
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(ra001InfoList, HttpStatus.OK);
     }
@@ -149,7 +165,8 @@ public class FbkController {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<FbkFilesInfo> rv001Files = new ArrayList<>();
         String directory = fbkConfig.getFbkPath();
-        List<Map<String, FbkFilesInfo>> fbkFiles = fbkFilesService.getFbkFiles(directory);
+        List<Map<String, FbkFilesInfo>> fbkFiles = fbkFilesService.getFbkFiles(directory); //list of file .DAT (not .BAK)
+        System.out.println("Size of List FBK files: " + fbkFiles.size());
         for (int i = 0; i < fbkFiles.size(); i++) {
             Map<String, FbkFilesInfo> filesInfoMap = fbkFiles.get(i);
             FbkFilesInfo rv001Info = filesInfoMap.get(FileType.RV001);
@@ -355,7 +372,7 @@ public class FbkController {
             Map<String, FbkFilesInfo> filesInfoMap = fbkFiles.get(i);
             FbkFilesInfo info = filesInfoMap.get(FileType.RA001);
             if (Validator.validateObject(info) && !fbkFilesService.isFbkFileExist(info)) {
-                ra001Service.importRA001(info);
+                ra001Service.importRA001(info); // add FBK file to DB and RA001info to DB
                 ra001Files.add(info);
 
                 // Copy and Delete

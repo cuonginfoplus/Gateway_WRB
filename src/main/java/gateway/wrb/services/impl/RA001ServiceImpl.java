@@ -64,6 +64,7 @@ public class RA001ServiceImpl implements RA001Service {
         return ra001InfoList;
     }
 
+    /*Đạt sửa lại importRA001 */
     @Override
     public void importRA001(FbkFilesInfo fbkFilesInfo) {
         Integer msgDscdLength = ra001Config.getMsgDscdLength();
@@ -169,8 +170,11 @@ public class RA001ServiceImpl implements RA001Service {
                         info.setIsuDt(isuDt);
                         info.setVldEdt(vldEdt);
 
-                        if (!isRA001exist(info))
-                            ra001Repo.save(info);
+                        if (!isRA001exist(info)) {
+                            ra001Repo.save(info); //save a RA001Info to DB
+                            System.out.println("Saved a RA001info to DB");
+                        }
+
 
                     }
                 } catch (Exception e) {
@@ -178,7 +182,8 @@ public class RA001ServiceImpl implements RA001Service {
                     logger.error(e.getMessage());
                 }
             });
-            fbkFilesRepo.addFbkFile(fbkFilesInfo);
+            fbkFilesRepo.addFbkFile(fbkFilesInfo); //add FBKfile to DB
+            System.out.println("Saved a R001_FBkFile to DB");
         } catch (IOException e) {
             e.printStackTrace();
         }
