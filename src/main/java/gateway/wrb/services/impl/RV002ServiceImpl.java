@@ -32,12 +32,12 @@ public class RV002ServiceImpl implements RV002Service {
 
     @Override
     public List<RV002Info> getAllRV002() {
-        return null;
+        return rv002Repo.getAllRV002();
     }
 
     @Override
     public RV002Info getRV002(long id) {
-        return null;
+        return rv002Repo.getRV002byID(id);
     }
 
     @Override
@@ -101,8 +101,14 @@ public class RV002ServiceImpl implements RV002Service {
                         line = line.substring(trnAvlYnLength);
                         String corpRecCompCode = line.substring(0, corpRecCompCodeLength);
                         line = line.substring(corpRecCompCodeLength);
-                        String filler = line.substring(0, fillerLength);
-                        line = line.substring(fillerLength);
+                        String filler = null;
+                        try {
+                            line.substring(0, fillerLength);
+                            line = line.substring(fillerLength);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
 
                         System.out.println("rv002Path : [" + fbkFilesInfo.getFullfbkpath() + ", outActNo :" + outActNo + ", virActNo:" + virActNo + ", virAcNm :" + virAcNm + ", refNo :" + refNo + ", recCodCd:" + recCodCd + ", trnAm:" + trnAm
                                 + ", trnAvlSdt:" + trnAvlSdt + ", trnAvlEdt:" + trnAvlEdt + ", trnAvlStm:" + trnAvlStm + ", trnAvlEtm:" + trnAvlEtm + ", trnAvlYn:" + trnAvlYn + ", corpRecCompCode:" + corpRecCompCode + ", filter:" + filler + "]");
@@ -123,7 +129,8 @@ public class RV002ServiceImpl implements RV002Service {
                         rv002Info.setTrnavlyn(trnAvlYn);
                         rv002Info.setCorpreccompcode(corpRecCompCode);
                         rv002Info.setFilter(filler);
-                        rv002Repo.addRV002(rv002Info);
+                        if (!isRV002exist(rv002Info))
+                            rv002Repo.addRV002(rv002Info);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -138,16 +145,18 @@ public class RV002ServiceImpl implements RV002Service {
 
     @Override
     public void updateRV002(RV002Info rv002Info) {
-
+        rv002Repo.updateRV002(rv002Info);
     }
 
     @Override
     public void deleteRV002(long userId) {
-
+        rv002Repo.deleteRV002(userId);
     }
 
     @Override
     public boolean isRV002exist(RV002Info rv002Info) {
-        return false;
+
+        return rv002Repo.isRV002Exist(rv002Info.getMsgdscd(),rv002Info.getOutactno(),rv002Info.getViractno(),rv002Info.getReccodcd(),
+                rv002Info.getTrnavlsdt(), rv002Info.getTrnavledt(), rv002Info.getTrnavlstm(),rv002Info.getTrnavletm(),rv002Info.getTrnavlyn());
     }
 }
