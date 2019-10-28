@@ -32,7 +32,7 @@ public class FbkFilesServiceImpl implements FbkFilesService {
             FbkFilesInfo fbkFilesInfo = new FbkFilesInfo();
             fbkFilesInfo.setFullfbkpath(fullFileName);
             String fileName = fullFileName.substring(fullFileName.lastIndexOf('/') + 1);
-            //String fileName = fullFileName.substring(fullFileName.lastIndexOf('\\') + 1);
+//            String fileName = fullFileName.substring(fullFileName.lastIndexOf('\\') + 1);
             if ((fileName.startsWith(fbkConfig.getHeaderSnd())) && fileName.endsWith(fbkConfig.getFbkType())) {
                 fbkFilesInfo.setFbkname(fileName);
                 String dateTime = convertDateTime(fileName);

@@ -6,6 +6,7 @@ import gateway.wrb.domain.*;
 import gateway.wrb.model.RA001Model;
 import gateway.wrb.model.RB001Model;
 import gateway.wrb.services.*;
+import gateway.wrb.util.DateUtils;
 import gateway.wrb.util.FileUtils;
 import gateway.wrb.util.Validator;
 import lombok.extern.log4j.Log4j;
@@ -55,8 +56,6 @@ public class FbkController {
 
     @Autowired
     private FbkConfig fbkConfig;
-    @Autowired
-    private RV001Repo rv001Repo;
 
     @GetMapping(value = "/test")
     public ResponseEntity<?> testAPI() {
@@ -397,7 +396,6 @@ public class FbkController {
     @PostMapping(value = "/ra001")
     public ResponseEntity<?> postRA001(@RequestBody RA001Model model) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
-        List<FbkFilesInfo> ra001Files = new ArrayList<>();
         String sndDir = fbkConfig.getFbkSend();
 
         if (model != null) {
@@ -406,7 +404,7 @@ public class FbkController {
         }
 
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
-        return new ResponseEntity<>(ra001Files, HttpStatus.OK);
+        return new ResponseEntity<>(DateUtils.dateYYYMMDDHHMMSS(), HttpStatus.OK);
     }
 
     /**
@@ -418,14 +416,13 @@ public class FbkController {
     @PostMapping(value = "/rb001")
     public ResponseEntity<?> postRB001(@RequestBody RB001Model model) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
-        List<FbkFilesInfo> rb001Files = new ArrayList<>();
         String sndDir = fbkConfig.getFbkSend();
         if (model != null) {
             //create request file
             rb001Service.createRB001Req(sndDir, model);
         }
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
-        return new ResponseEntity<>(rb001Files, HttpStatus.OK);
+        return new ResponseEntity<>(DateUtils.dateYYYMMDDHHMMSS(), HttpStatus.OK);
     }
 
 //    @Scheduled(fixedRate = 2000)

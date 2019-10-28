@@ -2,7 +2,6 @@ package gateway.wrb.repositories.impl;
 
 import gateway.wrb.domain.VLR001Info;
 import gateway.wrb.repositories.VLR001Repo;
-import gateway.wrb.util.Validator;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,8 +27,8 @@ public class VLRV001RepoImpl implements VLR001Repo {
     public List<VLR001Info> filterVLRV001(String orgCd, String bankCd, String bankCoNo, String outActNo, String rgsTrnSdt, String rgsTrnEdt) {
         List<VLR001Info> vlr001InfoList = new ArrayList<>();
 
-            String hql = "FROM VLR001Info";
-            vlr001InfoList = entityManager.createQuery(hql).getResultList();
+        String hql = "FROM VLR001Info";
+        vlr001InfoList = entityManager.createQuery(hql).getResultList();
 
         return vlr001InfoList;
     }

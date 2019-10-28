@@ -1,18 +1,17 @@
 package gateway.wrb.services.impl;
 
+import gateway.wrb.cache.SeqCache;
 import gateway.wrb.config.RA001Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.RA001Info;
 import gateway.wrb.model.RA001Model;
+import gateway.wrb.model.SeqModel;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.RA001Repo;
 import gateway.wrb.repositories.SysFileSeqRepo;
 import gateway.wrb.services.RA001Service;
-import gateway.wrb.util.AppConst;
-import gateway.wrb.util.DateUtils;
-import gateway.wrb.util.FileUtils;
-import gateway.wrb.util.StringUtils;
+import gateway.wrb.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +44,9 @@ public class RA001ServiceImpl implements RA001Service {
 
     @Autowired
     SysFileSeqRepo sysFileSeqRepo;
+
+    @Autowired
+    SeqCache seqCache;
 
     @Override
     public List<RA001Info> getAllRA001() {
@@ -307,11 +309,18 @@ public class RA001ServiceImpl implements RA001Service {
 
     private String createSndFileName(String fileType, String customerCode) {
         String strCurrDate = DateUtils.getDateFormat(new Date(), "yyyyMMdd");
-        Integer curSeq = sysFileSeqRepo.getNextSeq(strCurrDate, fileType);
-        String seq = "001";
-        if (curSeq != null) {
-            seq = StringUtils.padLeftZeros(curSeq.toString(), 3);
+        String seq = "1";
+        SeqModel seqModel = seqCache.getItem("fbk_awa_099_" + strCurrDate);
+
+        if (Validator.validate(seqModel)) {
+            Integer nextVal = seqModel.getSeqValue();
+            nextVal++;
+            seqCache.updateItem(new SeqModel("fbk_awa_099_" + strCurrDate, nextVal));
+        } else {
+            seqCache.addItem(new SeqModel("fbk_awa_099_" + strCurrDate, 1));
         }
+        SeqModel nextSeq = seqCache.getItem("fbk_awa_099_" + strCurrDate);
+        seq = StringUtils.padLeftZeros(String.valueOf(nextSeq.getSeqValue()), 3);
 
         StringBuilder sb = new StringBuilder();
         sb.append("fbk_awa_099_");

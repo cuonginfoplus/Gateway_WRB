@@ -45,7 +45,6 @@ public class RB001ServiceImpl implements RB001Service {
     SysFileSeqRepo sysFileSeqRepo;
 
 
-
     @Override
     public List<RB001Info> getRB001(String orgCd, String bankCd, String bankCoNo, String trnxId) {
         List<RB001Info> rb001Infos = rb001Repo.filterRB001(orgCd, bankCd, bankCoNo, trnxId);
