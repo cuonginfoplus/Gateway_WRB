@@ -2,6 +2,7 @@ package gateway.wrb.repositories.impl;
 
 import gateway.wrb.domain.RV001Info;
 import gateway.wrb.repositories.RV001Repo;
+import gateway.wrb.util.Validator;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +32,6 @@ public class RV001RepoImpl implements RV001Repo {
         List<RV001Info> rv001InfoList = new ArrayList<>();
         Map<String, String> mapParam = new LinkedHashMap<>();
         StringBuilder hql = new StringBuilder("FROM RV001Info as rv001 ");
-
-
         if (!orgCd.isEmpty()) {
             mapParam.put("orgCd", orgCd);
             hql.append(" INNER JOIN FbkFilesInfo AS fbkFile ON rv001.fbkname = fbkFile.fbkname WHERE fbkFile.conos = :orgCd ");
@@ -60,18 +59,14 @@ public class RV001RepoImpl implements RV001Repo {
             mapParam.put("bankRsvEdt", bankRsvEdt);
             hql.append(" AND rv001.trndt <= :bankRsvEdt");
         }
-        System.out.println(hql.toString());
         Query query = entityManager.createQuery(hql.toString());
         for (Map.Entry<String, String> entry : mapParam.entrySet()) {
             query.setParameter(entry.getKey(), entry.getValue());
-            System.out.println(entry.getKey() + "==========" + entry.getValue());
         }
 
         List<?> rs = new ArrayList<>();
         rs = query.getResultList();
         for (int i = 0; i < rs.size(); ++i) {
-            //Object[] row = (Object[]) rs.get(i);
-            //rv001InfoList.add((RV001Info) row[0]);
             if (!orgCd.isEmpty() && orgCd != null) {
                 Object[] row = (Object[]) rs.get(i);
                 rv001InfoList.add((RV001Info) row[0]);
@@ -102,18 +97,47 @@ public class RV001RepoImpl implements RV001Repo {
     /* Đạt sửa lại isRV001Exist */
     @Override
     public boolean isRV001Exist(String msgDscd, String trnDt, String trnTm, String msgNo,
-                                String wrdacNo, String rcvacNo, String wdram) {
-        //String hql = "FROM RV001Info as u WHERE u.msgDscd=:msgDscd";
-        String hql = "FROM RV001Info as u WHERE u.msgDscd =:msgDscd AND u.trnDt = :trnDt AND u.trnTm = :trnTm AND u.msgNo = :msgNo AND u.wrdacNo = :wrdacNo AND u.rcvacNo = :rcvacNo AND u.wdram = :wdram";
-        //int count = entityManager.createQuery(hql).setParameter("msgDscd", msgDscd).getResultList().size();
+                                String wdracno, String rcvacNo, String wdram) {
+        Map<String, String> mapParam = new LinkedHashMap<>();
+        String hql = "FROM RV001Info as rv001  WHERE";
+        if (Validator.validateString(msgDscd)) {
+            mapParam.put("msgDscd", msgDscd);
+            hql = hql.concat("  rv001.msgdscd = :msgDscd AND");
+        }
+        if (Validator.validateString(trnDt)) {
+            mapParam.put("trnDt", trnDt);
+            hql = hql.concat(" rv001.trndt = :trnDt AND");
+        }
+        if (Validator.validateString(trnTm)) {
+            mapParam.put("trnTm", trnTm);
+            hql = hql.concat(" rv001.trntm = :trnTm AND");
+        }
+        if (Validator.validateString(msgNo)) {
+            mapParam.put("msgNo", msgNo);
+            hql = hql.concat(" rv001.msgno = :msgNo AND");
+        }
+        if (Validator.validateString(wdracno)) {
+            mapParam.put("wdracno", wdracno);
+            hql = hql.concat(" rv001.wdracno = :wdracno AND");
+        }
+        if (Validator.validateString(rcvacNo)) {
+            mapParam.put("rcvacNo", rcvacNo);
+            hql = hql.concat(" rv001.rcvacno = :rcvacNo AND");
+        }
+        if (Validator.validateString(wdram)) {
+            mapParam.put("wdram", wdram);
+            hql = hql.concat(" rv001.wdram = :wdram");
+        }
+        if (hql.endsWith("WHERE")) {
+            hql = hql.replace("WHERE", "");
+        }
+        if (hql.endsWith("AND")) {
+            hql = hql.substring(0, hql.lastIndexOf("AND") - 1);
+        }
         Query query = entityManager.createQuery(hql);
-        query.setParameter("msgDscd", msgDscd);
-        query.setParameter("trnDt", trnDt);
-        query.setParameter("trnTm", trnTm);
-        query.setParameter("msgNo", msgNo);
-        query.setParameter("wrdacNo", wrdacNo);
-        query.setParameter("rcvacNo", rcvacNo);
-        query.setParameter("wdram", wdram);
+        for (Map.Entry<String, String> param : mapParam.entrySet()) {
+            query.setParameter(param.getKey(), param.getValue());
+        }
         Integer count = query.getResultList().size();
         return count > 0 ? true : false;
     }

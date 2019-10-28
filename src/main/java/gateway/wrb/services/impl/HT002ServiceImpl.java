@@ -31,12 +31,12 @@ public class HT002ServiceImpl implements HT002Service {
 
     @Override
     public List<HT002Info> getAllHT002() {
-        return null;
+        return ht002Repo.getAllHT002();
     }
 
     @Override
-    public List<HT002Info> getHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String InqSdt, String InqEdt) {
-        List<HT002Info> ht002InfoList = ht002Repo.filterHT002(orgCd, bankCd, bankCoNo, outActNo, InqSdt, InqEdt);
+    public List<HT002Info> getHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt) {
+        List<HT002Info> ht002InfoList = ht002Repo.filterHT002(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
         return ht002InfoList;
     }
 
@@ -161,7 +161,8 @@ public class HT002ServiceImpl implements HT002Service {
                         ht002Info.setDeprmk(depRmk);
                         ht002Info.setTrmprcsrno(trmPrcSrno);
                         ht002Info.setViractno(virActNo);
-                        ht002Repo.addHT002(ht002Info);
+                        if (!isHT002exist(ht002Info))
+                            ht002Repo.addHT002(ht002Info);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -175,17 +176,21 @@ public class HT002ServiceImpl implements HT002Service {
     }
 
     @Override
-    public void updateHT002(HT002Info rv001Info) {
-
+    public void updateHT002(HT002Info ht002Info) {
+        ht002Repo.updateHT002(ht002Info);
     }
 
     @Override
     public void deleteHT002(long id) {
-
+        ht002Repo.deleteHT002(id);
     }
 
     @Override
-    public boolean isHT002exist(HT002Info rv001Info) {
-        return false;
+    public boolean isHT002exist(HT002Info ht002Info) {
+        return ht002Repo.isHT002Exist(ht002Info.getMsgdscd(), ht002Info.getActno(), ht002Info.getTrndt(), ht002Info.getTrntm(),
+                ht002Info.getDrcr(), ht002Info.getTrnamt(), ht002Info.getTrnafbl(), ht002Info.getBrcd(), ht002Info.getChkamt(),
+                ht002Info.getTrntype(), ht002Info.getParticular(), ht002Info.getDepseq(), ht002Info.getStatus(), ht002Info.getChanneltype(),
+                ht002Info.getTrnsrno(), ht002Info.getDestaccount(), ht002Info.getRecievename(), ht002Info.getReftxt(),
+                ht002Info.getDeprmk(), ht002Info.getTrmprcsrno());
     }
 }
