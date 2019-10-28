@@ -99,6 +99,13 @@ public class DateUtils {
         return df.format(date);
     }
 
+    public static String dateYYYMMDDHHMMSS() {
+        Date date = new Date();
+        DateFormat df = new SimpleDateFormat(DATE_TIME_FORMAT);
+        return df.format(date);
+    }
+
+
     public static String formatDate(Long time) {
         if (time == null) {
             return null;

@@ -5,9 +5,9 @@ server:
   password: Info!@34
 
 path:
-  fbk: /root/WRB_Gateway
-  fbkbackup: /root/WRB_Gateway/Complete/
-  fbksend: /root/WRB_Gateway/Send/
+  fbk: /Users/macos/Downloads/FBK_files_exam/test_file
+  fbkbackup: /Users/macos/Downloads/FBK_files_exam/test_file/Complete/
+  fbksend: /Users/macos/Downloads/FBK_files_exam/test_file/Send/
   file:
     type: .dat
     header_snd: fbk_snd
