@@ -191,7 +191,8 @@ public class RV001ServiceImpl implements RV001Service {
                         rv001Info.setRefno(refNo);
                         rv001Info.setVractcusnm(vractCusNm);
                         rv001Info.setStsdscd(stsDscd);
-                        rv001Repo.addRV001(rv001Info);
+                        if (!isRV001exist(rv001Info))
+                            rv001Repo.addRV001(rv001Info);
                     }
 
                 } catch (Exception e) {
