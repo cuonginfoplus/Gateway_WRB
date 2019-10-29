@@ -5,7 +5,7 @@ server:
   password: Info!@34
 
 path:
-  fbk: /Users/macos/Downloads/FBK_files_exam/test_file
+  fbk: /Users/macos/Downloads/FBK_files_exam/test_file/
   fbkbackup: /Users/macos/Downloads/FBK_files_exam/test_file/Complete/
   fbksend: /Users/macos/Downloads/FBK_files_exam/test_file/Send/
   file:
@@ -13,6 +13,12 @@ path:
     header_snd: fbk_snd
     header_vir: fbk_vir
     header_awa: fbk_awa
+
+bank:
+  code: 970457
+oranization:
+  code: U000000001
+
 
 rv001:
   length:

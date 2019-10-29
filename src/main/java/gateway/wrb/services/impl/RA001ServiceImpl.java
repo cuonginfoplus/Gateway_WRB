@@ -1,6 +1,7 @@
 package gateway.wrb.services.impl;
 
 import gateway.wrb.cache.SeqCache;
+import gateway.wrb.config.BankConfig;
 import gateway.wrb.config.RA001Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
@@ -35,6 +36,9 @@ public class RA001ServiceImpl implements RA001Service {
     public static final Logger logger = LoggerFactory.getLogger(RA001ServiceImpl.class);
 
     @Autowired
+    BankConfig bankConfig;
+
+    @Autowired
     RA001Config ra001Config;
 
     @Autowired
@@ -57,17 +61,18 @@ public class RA001ServiceImpl implements RA001Service {
 
     @Override
     public List<RA001DTO> getRA001(String orgCd, String bankCd, String bankCoNo, String bankRsvSdt, String bankRsvEdt) {
-        List<RA001DTO> ra001InfoList = ra001Repo.filterRA001(orgCd, bankCd, bankCoNo, bankRsvSdt, bankRsvEdt);
-        return ra001InfoList;
+        String bankCode = bankConfig.getBankCode();
+        String orgCode = bankConfig.getOrgCode();
+        List<RA001DTO> ra001DTOS = new ArrayList<>();
+        if (!bankCode.equals(bankCd) || !orgCode.equals(orgCd)) {
+            return ra001DTOS;
+        } else {
+            ra001DTOS = ra001Repo.filterRA001(orgCd, bankCd, bankCoNo, bankRsvSdt, bankRsvEdt);
+        }
+
+        return ra001DTOS;
     }
 
-    @Override
-    public List<RA001Info> getRA001_2(String orgCd, String bankCd, String bankCoNo, String bankRsvSdt, String bankRsvEdt) {
-        List<RA001Info> ra001InfoList = ra001Repo.filterRA001_2(orgCd, bankCd, bankCoNo, bankRsvSdt, bankRsvEdt);
-        return ra001InfoList;
-    }
-
-    /*Đạt sửa lại importRA001 */
     @Override
     public void importRA001(FbkFilesInfo fbkFilesInfo) {
         Integer msgDscdLength = ra001Config.getMsgDscdLength();
@@ -124,21 +129,37 @@ public class RA001ServiceImpl implements RA001Service {
                         line = line.substring(msgDscdLength);
 
                         String wdrActNo = line.substring(0, wdrActNoLength);
+                        line = line.substring(wdrActNoLength);
                         String aplDscd = line.substring(0, aplDscdLength);
+                        line = line.substring(aplDscdLength);
                         String msgTrno = line.substring(0, msgTrnoLength);
+                        line = line.substring(msgTrnoLength);
                         String trnStDt = line.substring(0, trnStDtLength);
+                        line = line.substring(trnStDtLength);
                         String trnClsDt = line.substring(0, trnClsDtLength);
+                        line = line.substring(trnClsDtLength);
                         String trnType = line.substring(0, trnTypeLength);
+                        line = line.substring(trnTypeLength);
                         String status = line.substring(0, statusLength);
+                        line = line.substring(statusLength);
                         String curCd = line.substring(0, curCdLength);
+                        line = line.substring(curCdLength);
                         String rcpAm = line.substring(0, rcpAmLength);
+                        line = line.substring(rcpAmLength);
                         String rcpCnt = line.substring(0, rcpCntLength);
+                        line = line.substring(rcpCntLength);
                         String outParticular = line.substring(0, outParticularLength);
+                        line = line.substring(outParticularLength);
                         String inParticular = line.substring(0, inParticularLength);
+                        line = line.substring(inParticularLength);
                         String cusIdNoCd = line.substring(0, cusIdNoCdLength);
+                        line = line.substring(cusIdNoCdLength);
                         String cusIdNo = line.substring(0, cusIdNoLength);
+                        line = line.substring(cusIdNoLength);
                         String isuDt = line.substring(0, isuDtLength);
+                        line = line.substring(isuDtLength);
                         String vldEdt = line.substring(0, vldEdtLength);
+                        line = line.substring(vldEdtLength);
 
                         logger.info("ra001Path : [" + fbkFilesInfo.getFullfbkpath()
                                 + ", msgDscd :" + msgDscD + ", wdrActNo:" + wdrActNo
@@ -177,8 +198,6 @@ public class RA001ServiceImpl implements RA001Service {
                             ra001Repo.save(info); //save a RA001Info to DB
                             System.out.println("Saved a RA001info to DB");
                         }
-
-
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

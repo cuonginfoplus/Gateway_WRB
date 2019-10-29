@@ -2,7 +2,10 @@ package gateway.wrb.controllers;
 
 import gateway.wrb.config.FbkConfig;
 import gateway.wrb.constant.FileType;
-import gateway.wrb.domain.*;
+import gateway.wrb.domain.ER001Info;
+import gateway.wrb.domain.FbkFilesInfo;
+import gateway.wrb.domain.HT002Info;
+import gateway.wrb.domain.RV001Info;
 import gateway.wrb.model.RA001DTO;
 import gateway.wrb.model.RA001Model;
 import gateway.wrb.model.RB001Model;
@@ -17,8 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +32,7 @@ import java.util.Map;
 @Log4j
 @Controller
 @RequestMapping("/gateway")
+@Validated
 public class FbkController {
     public static final Logger logger = LoggerFactory.getLogger(FbkController.class);
     @Autowired
@@ -76,25 +83,16 @@ public class FbkController {
 
     @GetMapping(value = "/rv001/info")
     public ResponseEntity<?> getVLR001(
-            @RequestParam(value = "orgCd", defaultValue = "") String orgCd,
-            @RequestParam(value = "bankCd", defaultValue = "") String bankCd, //tạm bỏ
-            @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo, //tạm bỏ
-            @RequestParam(value = "outActNo", defaultValue = "") String outActNo,
-            @RequestParam(value = "bankRsvSdt", defaultValue = "") String bankRsvSdt,
-            @RequestParam(value = "bankRsvEdt", defaultValue = "") String bankRsvEdt
+            @Valid @NotBlank @RequestParam(value = "orgCd", defaultValue = "") String orgCd,
+            @Valid @NotBlank @RequestParam(value = "bankCd", defaultValue = "") String bankCd,
+            @Valid @NotBlank @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo,
+            @Valid @NotBlank @RequestParam(value = "outActNo", defaultValue = "") String outActNo,
+            @Valid @NotBlank @RequestParam(value = "bankRsvSdt", defaultValue = "") String bankRsvSdt,
+            @Valid @NotBlank @RequestParam(value = "bankRsvEdt", defaultValue = "") String bankRsvEdt
     ) {
-        System.out.println("Go into RV001");
-        System.out.println("orgCd: " + orgCd.isEmpty());
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<RV001Info> rv001InfoList = rv001Service.getRV001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
-        //List<VLR001Info> vlr001InfoList = vlr001Service.getVLR001(orgCd, bankCd, bankCoNo, outActNo, rgsTrnSdt, rgsTrnEdt);
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
-        //return new ResponseEntity<>(vlr001InfoList, HttpStatus.OK);
-        try {
-            System.out.println("Size of RV001 list: " + rv001InfoList.size());
-        } catch (Exception e) {
-
-        }
         return new ResponseEntity<>(rv001InfoList, HttpStatus.OK);
     }
 
@@ -115,34 +113,14 @@ public class FbkController {
 
     @GetMapping(value = "/ra001/info")
     public ResponseEntity<?> getRA001(
-            @RequestParam("orgCd") String orgCd,
-            @RequestParam("bankCd") String bankCd,
-            @RequestParam("bankCoNo") String bankCoNo,
-            @RequestParam("bankRsvSdt") String bankRsvSdt,
-            @RequestParam("bankRsvEdt") String bankRsvEdt
+            @Valid @NotBlank @RequestParam("orgCd") String orgCd,
+            @Valid @NotBlank @RequestParam("bankCd") String bankCd,
+            @Valid @NotBlank @RequestParam("bankCoNo") String bankCoNo,
+            @Valid @NotBlank @RequestParam("bankRsvSdt") String bankRsvSdt,
+            @Valid @NotBlank @RequestParam("bankRsvEdt") String bankRsvEdt
     ) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<RA001DTO> ra001InfoList = ra001Service.getRA001(orgCd, bankCd, bankCoNo, bankRsvSdt, bankRsvEdt);
-
-        try {
-            System.out.println("Size of RA001 list: " + ra001InfoList.size());
-        } catch (Exception e) {
-
-        }
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
-        return new ResponseEntity<>(ra001InfoList, HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/ra001_2/info")
-    public ResponseEntity<?> getRA001_2(
-            @RequestParam("orgCd") String orgCd,
-            @RequestParam("bankCd") String bankCd,
-            @RequestParam("bankCoNo") String bankCoNo,
-            @RequestParam("bankRsvSdt") String bankRsvSdt,
-            @RequestParam("bankRsvEdt") String bankRsvEdt
-    ) {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
-        List<RA001Info> ra001InfoList = ra001Service.getRA001_2(orgCd, bankCd, bankCoNo, bankRsvSdt, bankRsvEdt);
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(ra001InfoList, HttpStatus.OK);
     }

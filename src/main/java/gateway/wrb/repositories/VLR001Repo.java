@@ -10,6 +10,8 @@ public interface VLR001Repo {
     List<VLR001Info> filterVLRV001(String orgCd, String bankCd, String bankCoNo, String outActNo, String rgsTrnSdt, String rgsTrnEdt);
 
     boolean isVLR001exist(String msgDscd, String virActNo, String aplDscd, String trnAvlSdt, String trnAvlEdt, String trnAvlStm, String trnAvlEtm, String rgsTrnDt, String stsDscd);
+
     void updateVLR001(VLR001Info vlr001Info);
+
     void deleteVLR001(Long id);
 }

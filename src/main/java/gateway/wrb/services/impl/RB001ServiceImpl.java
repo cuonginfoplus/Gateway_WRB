@@ -147,25 +147,45 @@ public class RB001ServiceImpl implements RB001Service {
                         line = line.substring(D_msgDscdLength);
 
                         String seq = line.substring(0, D_seqLength);
+                        line = line.substring(D_seqLength);
                         String outActNo = line.substring(0, D_outActNoLength);
+                        line = line.substring(D_outActNoLength);
                         String curCd = line.substring(0, D_curCdLength);
+                        line = line.substring(D_curCdLength);
                         String trnAm = line.substring(0, D_trnAmLength);
+                        line = line.substring(D_trnAmLength);
                         String tobkDscd = line.substring(0, D_tobkDscd);
+                        line = line.substring(D_tobkDscd);
                         String istDscd = line.substring(0, D_istDscdLength);
+                        line = line.substring(D_istDscdLength);
                         String inCdAccGb = line.substring(0, D_inCdAccGbLength);
+                        line = line.substring(D_inCdAccGbLength);
                         String rcvbk1Cd = line.substring(0, D_rcvbk1CdLength);
+                        line = line.substring(D_rcvbk1CdLength);
                         String rcvbk2Cd = line.substring(0, D_rcvbk2CdLength);
+                        line = line.substring(D_rcvbk2CdLength);
                         String rcvbkNm = line.substring(0, D_rcvbkNmLength);
+                        line = line.substring(D_rcvbkNmLength);
                         String sndName = line.substring(0, D_sndNameLength);
+                        line = line.substring(D_sndNameLength);
                         String rcvacDppeNm = line.substring(0, D_rcvacDppeNmLength);
+                        line = line.substring(D_rcvacDppeNmLength);
                         String depRmk = line.substring(0, D_depRmkLength);
+                        line = line.substring(D_depRmkLength);
                         String wdrRmk = line.substring(0, D_wdrRmkLength);
+                        line = line.substring(D_wdrRmkLength);
                         String trnSrno = line.substring(0, D_trnSrnoLength);
+                        line = line.substring(D_trnSrnoLength);
                         String status = line.substring(0, D_statusLength);
+                        line = line.substring(D_statusLength);
                         String prcCd = line.substring(0, D_prcCdLength);
+                        line = line.substring(D_prcCdLength);
                         String errCd = line.substring(0, D_errCdLength);
+                        line = line.substring(D_errCdLength);
                         String refNo = line.substring(0, D_refNoLength);
+                        line = line.substring(D_refNoLength);
                         String filler = line.substring(0, D_fillerLength);
+                        line = line.substring(D_fillerLength);
 
                         logger.info("rb001Path : [" + fbkFilesInfo.getFullfbkpath()
                                 + ", msgDscd :" + msgDscD + ", seq:" + seq
