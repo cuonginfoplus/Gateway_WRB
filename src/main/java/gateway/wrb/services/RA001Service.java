@@ -22,5 +22,4 @@ public interface RA001Service {
 
     void createRA001Req(String dir, RA001Model model);
 
-    List<RA001Info> getRA001_2(String orgCd, String bankCd, String bankCoNo, String bankRsvSdt, String bankRsvEdt);
 }

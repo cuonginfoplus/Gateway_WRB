@@ -1,5 +1,6 @@
 package gateway.wrb.services.impl;
 
+import gateway.wrb.config.BankConfig;
 import gateway.wrb.config.FbkConfig;
 import gateway.wrb.config.RV001Config;
 import gateway.wrb.constant.FileType;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -33,6 +35,8 @@ public class RV001ServiceImpl implements RV001Service {
     private RV001Config rv001Config;
     @Autowired
     private FbkConfig fbkConfig;
+    @Autowired
+    private BankConfig bankConfig;
 
     @Override
     public List<RV001Info> getAllRV001() {
@@ -41,8 +45,16 @@ public class RV001ServiceImpl implements RV001Service {
 
     @Override
     public List<RV001Info> getRV001(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt) {
-        List<RV001Info> objList = rv001Repo.filterRV001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
-        return objList;
+        String bankCode = bankConfig.getBankCode();
+        String orgCode = bankConfig.getOrgCode();
+        List<RV001Info> rv001Infos = new ArrayList<>();
+
+        if (!bankCode.equals(bankCd) || !orgCode.equals(orgCd)) {
+            return rv001Infos;
+        } else {
+            rv001Infos = rv001Repo.filterRV001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
+        }
+        return rv001Infos;
     }
 
     @Override
@@ -93,7 +105,6 @@ public class RV001ServiceImpl implements RV001Service {
         try (Stream<String> stream = Files.lines(Paths.get(fbkFilesInfo.getFullfbkpath()))) {
             stream.forEach(line -> {
                 try {
-
                     if (line.startsWith(FileType.PREFIX_START)) {
                         String msgDscdS = line.substring(0, msgDscdLength);
                         line = line.substring(msgDscdLength);
@@ -107,15 +118,12 @@ public class RV001ServiceImpl implements RV001Service {
                         line = line.substring(tmsDtLength);
                         String tmsTm = line.substring(0, tmsTmLength);
                         line = line.substring(tmsTmLength);
-
                         fbkFilesInfo.setConos(coNo);
                         fbkFilesInfo.setMgscds(mgscd);
                         fbkFilesInfo.setRecmsgcds(recMsgcd);
                         fbkFilesInfo.setTmsdts(tmsDt);
                         fbkFilesInfo.setTmstms(tmsTm);
-
                     } else if (line.startsWith(FileType.PREFIX_CONTENT)) {
-
                         String msgDscd = line.substring(0, msgDscdLength);
                         line = line.substring(msgDscdLength);
                         String trnDt = line.substring(0, trnDtLength);
@@ -194,7 +202,6 @@ public class RV001ServiceImpl implements RV001Service {
                         if (!isRV001exist(rv001Info))
                             rv001Repo.addRV001(rv001Info);
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                     logger.error(e.getMessage());

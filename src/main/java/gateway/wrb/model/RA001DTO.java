@@ -11,9 +11,9 @@ public class RA001DTO {
     private String trnClsDt;
     private String status;
     private String curCd;
-    private  String rcpAm;
+    private String rcpAm;
     private String rcpCnt;
-    private  String outParticular;
+    private String outParticular;
     private String inParticular;
     private String cus_id_no_cd;
     private String cus_id_no;
@@ -22,7 +22,7 @@ public class RA001DTO {
     private String bankRcvDt;
     private String bankRcvTm;
 
-    public void convertToDTO(RA001Info ra001Info){
+    public void convertToDTO(RA001Info ra001Info) {
         this.wdrActNo = ra001Info.getWdrActNo();
         this.msgTrno = ra001Info.getMsgTrno();
         this.trnStDt = ra001Info.getTrnStDt();

@@ -1,9 +1,11 @@
 package gateway.wrb.services.impl;
 
+import gateway.wrb.config.BankConfig;
 import gateway.wrb.config.HT002Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.HT002Info;
+import gateway.wrb.domain.RV001Info;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.HT002Repo;
 import gateway.wrb.services.HT002Service;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -23,11 +26,15 @@ public class HT002ServiceImpl implements HT002Service {
     public static final Logger logger = LoggerFactory.getLogger(HT002ServiceImpl.class);
     @Autowired
     HT002Config ht002Config;
+
     @Autowired
     HT002Repo ht002Repo;
 
     @Autowired
     FbkFilesRepo fbkFilesRepo;
+
+    @Autowired
+    private BankConfig bankConfig;
 
     @Override
     public List<HT002Info> getAllHT002() {
@@ -36,7 +43,15 @@ public class HT002ServiceImpl implements HT002Service {
 
     @Override
     public List<HT002Info> getHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt) {
-        List<HT002Info> ht002InfoList = ht002Repo.filterHT002(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
+        String bankCode = bankConfig.getBankCode();
+        String orgCode = bankConfig.getOrgCode();
+        List<HT002Info> ht002InfoList = new ArrayList<>();
+
+        if (!bankCode.equals(bankCd) || !orgCode.equals(orgCd)) {
+            return ht002InfoList;
+        } else {
+            ht002InfoList = ht002Repo.filterHT002(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
+        }
         return ht002InfoList;
     }
 

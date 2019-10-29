@@ -2,7 +2,6 @@ package gateway.wrb.repositories.impl;
 
 import gateway.wrb.domain.RV002Info;
 import gateway.wrb.repositories.RV002Repo;
-import gateway.wrb.repositories.SeqRepo;
 import gateway.wrb.util.Validator;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,59 +53,59 @@ public class RV002RepoImpl implements RV002Repo {
         Long count = 0l;
         String hql = "SELECT COUNT(*) FROM RV002Info as rv002 WHERE";
         Map<String, String> mapParam = new LinkedHashMap<>();
-        if(Validator.validateString(msgDscd)){
-            mapParam.put("msgDscd",msgDscd);
+        if (Validator.validateString(msgDscd)) {
+            mapParam.put("msgDscd", msgDscd);
             hql = hql.concat(" rv002.msgdscd = :msgDscd AND");
         }
-        if(Validator.validateString(outActNo)){
-            mapParam.put("outActNo",outActNo);
+        if (Validator.validateString(outActNo)) {
+            mapParam.put("outActNo", outActNo);
             hql = hql.concat(" rv002.outactno = :outActNo AND");
         }
-        if(Validator.validateString(virActno)){
-            mapParam.put("virActno",virActno);
+        if (Validator.validateString(virActno)) {
+            mapParam.put("virActno", virActno);
             hql = hql.concat(" rv002.viractno = :virActno AND");
         }
-        if(Validator.validateString(recCodCd)){
-            mapParam.put("recCodCd",recCodCd);
+        if (Validator.validateString(recCodCd)) {
+            mapParam.put("recCodCd", recCodCd);
             hql = hql.concat(" rv002.reccodcd = :recCodCd AND");
         }
-        if(Validator.validateString(trnAvlSdt)){
-            mapParam.put("trnAvlSdt",trnAvlSdt);
+        if (Validator.validateString(trnAvlSdt)) {
+            mapParam.put("trnAvlSdt", trnAvlSdt);
             hql = hql.concat(" rv002.trnavlsdt = :trnAvlSdt AND");
         }
-        if(Validator.validateString(trnAvlEdt)){
-            mapParam.put("trnAvlEdt",trnAvlEdt);
+        if (Validator.validateString(trnAvlEdt)) {
+            mapParam.put("trnAvlEdt", trnAvlEdt);
             hql = hql.concat(" rv002.trnavledt = :trnAvlEdt AND");
         }
-        if(Validator.validateString(trnAvlStm)){
-            mapParam.put("trnAvlStm",trnAvlStm);
+        if (Validator.validateString(trnAvlStm)) {
+            mapParam.put("trnAvlStm", trnAvlStm);
             hql = hql.concat(" rv002.trnavlstm = :trnAvlStm AND");
         }
-        if(Validator.validateString(trnAvlEtm)){
-            mapParam.put("trnAvlEtm",trnAvlEtm);
+        if (Validator.validateString(trnAvlEtm)) {
+            mapParam.put("trnAvlEtm", trnAvlEtm);
             hql = hql.concat(" rv002.trnavletm = :trnAvlEtm AND");
         }
-        if(Validator.validateString(trnAvlyn)){
-            mapParam.put("trnAvlyn",trnAvlyn);
+        if (Validator.validateString(trnAvlyn)) {
+            mapParam.put("trnAvlyn", trnAvlyn);
             hql = hql.concat(" rv002.trnavlyn = :trnAvlyn");
         }
-        if(hql.endsWith("WHERE")){
-            hql = hql.replace("WHERE","");
+        if (hql.endsWith("WHERE")) {
+            hql = hql.replace("WHERE", "");
         }
-        if(hql.endsWith("AND")){
-            hql = hql.substring(0,hql.lastIndexOf("AND")-1);
+        if (hql.endsWith("AND")) {
+            hql = hql.substring(0, hql.lastIndexOf("AND") - 1);
         }
 
         try {
             Query query = entityManager.createQuery(hql);
             for (Map.Entry<String, String> param : mapParam.entrySet())
-                query.setParameter(param.getKey(),param.getValue());
+                query.setParameter(param.getKey(), param.getValue());
             List<Long> rs = query.getResultList();
             count = rs.get(0);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return count > 0 ? true :false;
+        return count > 0 ? true : false;
     }
 
 

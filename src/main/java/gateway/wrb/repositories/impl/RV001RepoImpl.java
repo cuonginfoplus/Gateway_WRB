@@ -32,32 +32,21 @@ public class RV001RepoImpl implements RV001Repo {
         List<RV001Info> rv001InfoList = new ArrayList<>();
         Map<String, String> mapParam = new LinkedHashMap<>();
         StringBuilder hql = new StringBuilder("FROM RV001Info as rv001 ");
-        if (!orgCd.isEmpty()) {
-            mapParam.put("orgCd", orgCd);
-            hql.append(" INNER JOIN FbkFilesInfo AS fbkFile ON rv001.fbkname = fbkFile.fbkname WHERE fbkFile.conos = :orgCd ");
-        } else {
-            hql.append(" WHERE 1 = 1 ");
+        if (Validator.validateString(bankCoNo)) {
+            mapParam.put("bankCoNo", bankCoNo);
+            hql.append(" INNER JOIN FbkFilesInfo AS fbkFile ON rv001.fbkname = fbkFile.fbkname WHERE fbkFile.conos = :bankCoNo ");
         }
-        if (!bankCd.isEmpty()) {
-            //mapParam.put("bankCd", bankCd);
-            //hql.append("AND rv001.")
-        }
-        if (!bankCoNo.isEmpty()) {
-            //mapParam.put("bankCoNo", bankCoNo);
-            //hql.append ...
-        }
-
-        if (!outActNo.isEmpty()) {
+        if (Validator.validateString(outActNo)) {
             mapParam.put("outActNo", outActNo);
-            hql.append(" AND rv001.rcvacno = :outActNo");
+            hql.append(" AND rv001.rcvviracno = :outActNo");
         }
-        if (!bankRsvSdt.isEmpty()) {
+        if (Validator.validateString(bankRsvSdt)) {
             mapParam.put("bankRsvSdt", bankRsvSdt);
-            hql.append(" AND rv001.trndt >= :bankRsvSdt");
+            hql.append(" AND STR_TO_DATE(rv001.trndt,'%Y%m%d')  > STR_TO_DATE(:bankRsvSdt,'%Y%m%d') ");
         }
-        if (!bankRsvEdt.isEmpty()) {
+        if (Validator.validateString(bankRsvEdt)) {
             mapParam.put("bankRsvEdt", bankRsvEdt);
-            hql.append(" AND rv001.trndt <= :bankRsvEdt");
+            hql.append(" AND STR_TO_DATE(rv001.trndt,'%Y%m%d')  < STR_TO_DATE(:bankRsvEdt,'%Y%m%d') ");
         }
         Query query = entityManager.createQuery(hql.toString());
         for (Map.Entry<String, String> entry : mapParam.entrySet()) {
@@ -67,12 +56,8 @@ public class RV001RepoImpl implements RV001Repo {
         List<?> rs = new ArrayList<>();
         rs = query.getResultList();
         for (int i = 0; i < rs.size(); ++i) {
-            if (!orgCd.isEmpty() && orgCd != null) {
-                Object[] row = (Object[]) rs.get(i);
-                rv001InfoList.add((RV001Info) row[0]);
-            } else {
-                rv001InfoList.add((RV001Info) rs.get(i));
-            }
+            Object[] row = (Object[]) rs.get(i);
+            rv001InfoList.add((RV001Info) row[0]);
         }
         return rv001InfoList;
     }

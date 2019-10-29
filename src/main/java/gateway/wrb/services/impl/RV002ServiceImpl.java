@@ -155,8 +155,7 @@ public class RV002ServiceImpl implements RV002Service {
 
     @Override
     public boolean isRV002exist(RV002Info rv002Info) {
-
-        return rv002Repo.isRV002Exist(rv002Info.getMsgdscd(),rv002Info.getOutactno(),rv002Info.getViractno(),rv002Info.getReccodcd(),
-                rv002Info.getTrnavlsdt(), rv002Info.getTrnavledt(), rv002Info.getTrnavlstm(),rv002Info.getTrnavletm(),rv002Info.getTrnavlyn());
+        return rv002Repo.isRV002Exist(rv002Info.getMsgdscd(), rv002Info.getOutactno(), rv002Info.getViractno(), rv002Info.getReccodcd(),
+                rv002Info.getTrnavlsdt(), rv002Info.getTrnavledt(), rv002Info.getTrnavlstm(), rv002Info.getTrnavletm(), rv002Info.getTrnavlyn());
     }
 }
