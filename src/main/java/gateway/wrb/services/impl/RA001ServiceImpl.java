@@ -5,6 +5,7 @@ import gateway.wrb.config.RA001Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.RA001Info;
+import gateway.wrb.model.RA001DTO;
 import gateway.wrb.model.RA001Model;
 import gateway.wrb.model.SeqModel;
 import gateway.wrb.repositories.FbkFilesRepo;
@@ -55,8 +56,8 @@ public class RA001ServiceImpl implements RA001Service {
     }
 
     @Override
-    public List<RA001Info> getRA001(String orgCd, String bankCd, String bankCoNo) {
-        List<RA001Info> ra001InfoList = ra001Repo.filterRA001(orgCd, bankCd, bankCoNo);
+    public List<RA001DTO> getRA001(String orgCd, String bankCd, String bankCoNo, String bankRsvSdt, String bankRsvEdt) {
+        List<RA001DTO> ra001InfoList = ra001Repo.filterRA001(orgCd, bankCd, bankCoNo, bankRsvSdt, bankRsvEdt);
         return ra001InfoList;
     }
 
