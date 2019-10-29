@@ -1,11 +1,12 @@
 package gateway.wrb.repositories;
 
 import gateway.wrb.domain.RA001Info;
+import gateway.wrb.model.RA001DTO;
 
 import java.util.List;
 
 public interface RA001Repo {
-    List<RA001Info> filterRA001(String orgCd, String bankCd, String bankCoNo);
+    List<RA001DTO> filterRA001(String orgCd, String bankCd, String bankCoNo, String bankRsvSdt, String bankRsvEdt);
 
     void save(RA001Info info);
 

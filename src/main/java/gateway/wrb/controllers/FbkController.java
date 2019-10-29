@@ -3,9 +3,9 @@ package gateway.wrb.controllers;
 import gateway.wrb.config.FbkConfig;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.*;
+import gateway.wrb.model.RA001DTO;
 import gateway.wrb.model.RA001Model;
 import gateway.wrb.model.RB001Model;
-import gateway.wrb.repositories.RV002Repo;
 import gateway.wrb.services.*;
 import gateway.wrb.util.DateUtils;
 import gateway.wrb.util.FileUtils;
@@ -117,10 +117,12 @@ public class FbkController {
     public ResponseEntity<?> getRA001(
             @RequestParam("orgCd") String orgCd,
             @RequestParam("bankCd") String bankCd,
-            @RequestParam("bankCoNo") String bankCoNo
+            @RequestParam("bankCoNo") String bankCoNo,
+            @RequestParam("bankRsvSdt") String bankRsvSdt,
+            @RequestParam("bankRsvEdt") String bankRsvEdt
     ) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
-        List<RA001Info> ra001InfoList = ra001Service.getRA001(orgCd, bankCd, bankCoNo);
+        List<RA001DTO> ra001InfoList = ra001Service.getRA001(orgCd, bankCd, bankCoNo, bankRsvSdt, bankRsvEdt);
 
         try {
             System.out.println("Size of RA001 list: " + ra001InfoList.size());

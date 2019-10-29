@@ -1,6 +1,8 @@
 package gateway.wrb.repositories.impl;
 
+import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.RA001Info;
+import gateway.wrb.model.RA001DTO;
 import gateway.wrb.repositories.RA001Repo;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,52 +53,31 @@ public class RA001RepoImpl implements RA001Repo {
     }
 
     @Override
-    public List<RA001Info> filterRA001(String orgCd, String bankCd, String bankCoNo) {
-        List<RA001Info> ra001InfoList = new ArrayList<>();
-        //String hql = "FROM VLR001Info";
-        /*if (Validator.validateObjects(orgCd, bankCd, bankCoNo)) {
-            String hql = "FROM RA001Info ";
-            System.out.println("SQl: "+hql);
-            Query query = entityManager.createQuery(hql);
-            System.out.println("QUERY thanh cong");
-            ra001InfoList = query.getResultList();
-        }*/
-        Map<String, String> mapParam = new LinkedHashMap<>();
-        StringBuilder hql = new StringBuilder("FROM RA001Info AS ra001 ");
-        if (!orgCd.isEmpty() && orgCd != null) {
-            mapParam.put("orgCd", orgCd);
-            hql.append(" INNER JOIN FbkFilesInfo AS fbkFiles ON ra001.fbkname = fbkFiles.fbkname WHERE fbkFiles.conos = :orgCd ");
-        } else {
-            hql.append(" WHERE 1 = 1 ");
-        }
-        if (!bankCd.isEmpty() && bankCd != null) {
-            // mapParam.put("bankCd",bankCd);
-        }
-        if (!bankCoNo.isEmpty() && bankCoNo != null) {
-            // mapParam.put("bankCoNo",bankCoNo);
-        }
-        System.out.println(hql.toString());
-        Query query = entityManager.createQuery(hql.toString());
-        for (Map.Entry<String, String> param : mapParam.entrySet()) {
-            query.setParameter(param.getKey(), param.getValue());
-        }
+    public List<RA001DTO> filterRA001(String orgCd, String bankCd, String bankCoNo, String bankRsvSdt, String bankRsvEdt) {
         List<?> rs = new ArrayList<>();
-        rs = query.getResultList();
-        for (int i = 0; i < rs.size(); ++i) {
-            //bject[] row = (Object[]) rs.get(i);
-            //System.out.println(row[0]);
-            //ra001InfoList.add((RA001Info) rs);
-            //System.out.println(((RA001Info) rs.get(i)).getId());
-            //ra001InfoList.add(((RA001Info) rs.get(i).get(0)));
-            if (!orgCd.isEmpty() && orgCd != null) {
+        List<RA001DTO> ra001DTOList = new ArrayList<>();
+        String hql = "FROM RA001Info AS ra001 INNER JOIN FbkFilesInfo AS fbkFiles" +
+                " ON ra001.fbkname = fbkFiles.fbkname WHERE fbkFiles.conos = :orgCd" +
+                " AND STR_TO_DATE (fbkFiles.trndt, '%Y%m%d') >= STR_TO_DATE (:bankRsvSdt, '%Y%m%d')" +
+                " AND STR_TO_DATE (fbkFiles.trndt, '%Y%m%d') <= STR_TO_DATE (:bankRsvEdt, '%Y%m%d')";
+        try {
+            Query query = entityManager.createQuery(hql);
+            query.setParameter("orgCd",orgCd);
+            query.setParameter("bankRsvSdt",bankRsvSdt);
+            query.setParameter("bankRsvEdt",bankRsvEdt);
+            rs = query.getResultList();
+            for(int i=0;i<rs.size();++i){
                 Object[] row = (Object[]) rs.get(i);
-                ra001InfoList.add((RA001Info) row[0]);
-            } else {
-                ra001InfoList.add((RA001Info) rs.get(i));
+                RA001DTO ra001DTO = new RA001DTO();
+                ra001DTO.convertToDTO((RA001Info) row[0]);
+                ra001DTO.setBankRcvDt(((FbkFilesInfo )row[1]).getTmsdts());
+                ra001DTO.setBankRcvTm(((FbkFilesInfo )row[1]).getTmstms());
+                ra001DTOList.add(ra001DTO);
             }
+        } catch (Exception e){
+            e.printStackTrace();
         }
-
-        return ra001InfoList;
+        return ra001DTOList;
     }
 }
 
