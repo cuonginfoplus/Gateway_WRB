@@ -193,34 +193,19 @@ public class VLR001ServiceImpl implements VLR001Service {
     @Override
     public void updateVLR001(VLR001Info info) {
         // TODO Auto-generated method stub
-
+        vlr001Repo.updateVLR001(info);
     }
 
     @Override
     public void deleteVLR001(long id) {
         // TODO Auto-generated method stub
-
+        vlr001Repo.deleteVLR001(id);
     }
 
     @Override
     public boolean isVLR001exist(VLR001Info info) {
-        try {
-            Integer countEntity = vlr001Repo.isVLR001exist(info.getMsgdscd(), info.getVirActNo()
-                    , info.getAplDscd(), info.getTrnAvlSdt()
-                    , info.getTrnAvlEdt(), info.getTrnAvlStm()
-                    , info.getTrnAvlEtm(), info.getRgsTrnDt()
-                    , info.getStsDscd());
-            logger.info("VLR001 " + info.getMsgdscd() + "," + info.getVirActNo() + " detail has count = " + countEntity);
-
-
-            if (countEntity < 1)
-                return false;
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-        }
-        return true;
+        return vlr001Repo.isVLR001exist(info.getMsgdscd(), info.getVirActNo(), info.getAplDscd(), info.getTrnAvlSdt(),
+                info.getTrnAvlEdt(), info.getTrnAvlStm(), info.getTrnAvlEtm(), info.getRgsTrnDt(), info.getStsDscd());
     }
 
 }
