@@ -1,10 +1,14 @@
 package gateway.wrb.services.impl;
 
+import gateway.wrb.config.BankConfig;
 import gateway.wrb.config.RB001Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.RB001Info;
+import gateway.wrb.domain.RB001SInfo;
+import gateway.wrb.model.RB001DTO;
 import gateway.wrb.model.RB001Model;
+import gateway.wrb.model.RB001SDTO;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.RB001Repo;
 import gateway.wrb.repositories.SysFileSeqRepo;
@@ -33,6 +37,9 @@ public class RB001ServiceImpl implements RB001Service {
     public static final Logger logger = LoggerFactory.getLogger(RB001ServiceImpl.class);
 
     @Autowired
+    BankConfig bankConfig;
+
+    @Autowired
     RB001Config rb001Config;
 
     @Autowired
@@ -46,9 +53,16 @@ public class RB001ServiceImpl implements RB001Service {
 
 
     @Override
-    public List<RB001Info> getRB001(String orgCd, String bankCd, String bankCoNo, String trnxId) {
-        List<RB001Info> rb001Infos = rb001Repo.filterRB001(orgCd, bankCd, bankCoNo, trnxId);
-        return rb001Infos;
+    public List<RB001DTO> getRB001(String orgCd, String bankCd, String bankCoNo, String trnxId) {
+        String bankCode = bankConfig.getBankCode();
+        String orgCode = bankConfig.getOrgCode();
+        List<RB001DTO> rb001DTOS = new ArrayList<>();
+        if (!bankCode.equals(bankCd) || !orgCode.equals(orgCd)) {
+            return rb001DTOS;
+        } else {
+            rb001DTOS = rb001Repo.filterRB001(orgCd, bankCd, bankCoNo, trnxId);
+        }
+        return rb001DTOS;
     }
 
     @Override
@@ -138,9 +152,26 @@ public class RB001ServiceImpl implements RB001Service {
                         String confirmDupYn = line.substring(0, S_confirmDupYn);
                         line = line.substring(S_confirmDupYn);
 
+                        RB001SInfo rb001SInfo = new RB001SInfo();
+                        rb001SInfo.setMsgDscd("S");
+                        rb001SInfo.setCoNo(coNo);
+                        rb001SInfo.setReqDt(reqDt);
+                        rb001SInfo.setTrnDt(trnDt);
+                        rb001SInfo.setInActNo(inActNo);
+                        rb001SInfo.setTrnDscd(trnDscd);
+                        rb001SInfo.setRqDscd(rqDscd);
+                        rb001SInfo.setMultiTrnCd(multiTrnCd);
+                        rb001SInfo.setFeePreOcc(feePreOcc);
+                        rb001SInfo.setFeeInclYn(feeIncYn);
+                        rb001SInfo.setFirmSvrSec(firmSvrSec);
+                        rb001SInfo.setComfirmDupYn(confirmDupYn);
+                        rb001SInfo.setFbkname(fbkFilesInfo.getFbkname());
+
                         fbkFilesInfo.setTmsdts(trnDt);
                         fbkFilesInfo.setTmstms("");
                         fbkFilesInfo.setConos(coNo);
+
+                        rb001Repo.save_header(rb001SInfo);
 
                     } else if (line.startsWith(FileType.PREFIX_CONTENT)) {
                         String msgDscD = line.substring(0, D_msgDscdLength);
@@ -226,8 +257,8 @@ public class RB001ServiceImpl implements RB001Service {
                         info.setRefNo(refNo);
                         info.setFiller(filler);
 
-                        if (!isRB001exist(info))
-                            rb001Repo.save(info);
+                        //if (!isRB001exist(info))
+                        rb001Repo.save(info);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -284,6 +315,19 @@ public class RB001ServiceImpl implements RB001Service {
         String path = dir + sndFileName;
         utils.createFile(path, contents);
 
+    }
+
+    @Override
+    public List<RB001SDTO> getRB001S(String orgCd, String bankCd, String bankCoNo, String trnxId) {
+        String bankCode = bankConfig.getBankCode();
+        String orgCode = bankConfig.getOrgCode();
+        List<RB001SDTO> rb001SDTOS = new ArrayList<>();
+        if (!bankCode.equals(bankCd) || !orgCode.equals(orgCd)) {
+            return rb001SDTOS;
+        } else {
+            rb001SDTOS = rb001Repo.filterRB001S(orgCd, bankCd, bankCoNo, trnxId);
+        }
+        return rb001SDTOS;
     }
 
     private String buildStartContent(RB001Model model) {

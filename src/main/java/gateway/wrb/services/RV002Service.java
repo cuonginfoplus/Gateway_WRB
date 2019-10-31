@@ -3,6 +3,7 @@ package gateway.wrb.services;
 
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.RV002Info;
+import gateway.wrb.model.RV002Model;
 
 import java.util.List;
 
@@ -18,4 +19,6 @@ public interface RV002Service {
     void deleteRV002(long id);
 
     boolean isRV002exist(RV002Info rv002Info);
+
+    void createRV002Req(String sndDir, RV002Model model);
 }

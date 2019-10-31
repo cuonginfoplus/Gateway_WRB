@@ -1,6 +1,7 @@
 package gateway.wrb.repositories.impl;
 
 import gateway.wrb.domain.HT002Info;
+import gateway.wrb.model.HT002DTO;
 import gateway.wrb.repositories.HT002Repo;
 import gateway.wrb.util.Validator;
 import org.springframework.stereotype.Repository;
@@ -35,59 +36,55 @@ public class HT002RepoImpl implements HT002Repo {
     }
 
     @Override
-    public List<HT002Info> filterHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt) {
-        List<HT002Info> ht002InfoList = new ArrayList<>();
-        Map<String, String> mapParam = new LinkedHashMap<>();
-        String hql = "FROM HT002Info as ht002";
-        if (Validator.validateString(orgCd)) {
-            mapParam.put("orgCd", orgCd);
-            hql = hql.concat(" INNER JOIN FbkFilesInfo as fbkFiles ON ht002.fbkname = fbkFiles.fbkname WHERE fbkFiles.conos = :orgCd AND");
-        }
-        if (!Validator.validateString(orgCd)) {
-            hql = hql.concat(" WHERE");
-        }
-        if (Validator.validateString(bankCd)) {
-            //
-        }
-        if (Validator.validateString(bankCoNo)) {
-            //
-        }
-        if (Validator.validateString(outActNo)) {
-            mapParam.put("outActNo", outActNo);
-            hql = hql.concat(" ht002.viractno = :outActNo AND");
-        }
-        if (Validator.validateString(bankRsvSdt)) {
-            mapParam.put("bankRsvSdt", bankRsvSdt);
-            hql = hql.concat(" ht002.trndt >= :bankRsvSdt AND");
-        }
-        if (Validator.validateString(bankRsvEdt)) {
-            mapParam.put("bankRsvEdt", bankRsvEdt);
-            hql = hql.concat(" ht002.trndt <= :bankRsvEdt");
-        }
-        if (hql.endsWith("END")) {
-            hql = hql.substring(0, hql.lastIndexOf("AND") - 1);
-        }
+    public List<HT002DTO> filterHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String InqSdt, String InqEdt) {
+        List<HT002DTO> ht002DTOS = new ArrayList<>();
+        StringBuilder hql = new StringBuilder("FROM HT002Info as ht002 " +
+                "INNER JOIN FbkFilesInfo AS fbkFiles ON ht002.fbkname = fbkFiles.fbkname " +
+                "WHERE fbkFiles.conos = :bankCoNo " +
+                "AND ht002.viractno = :outActNo");
         try {
-            System.out.println("HQL Query: " + hql);
-            Query query = entityManager.createQuery(hql);
-            for (Map.Entry<String, String> param : mapParam.entrySet()) {
-                query.setParameter(param.getKey(), param.getValue());
+            Map<String, String> mapParam = new LinkedHashMap<>();
+            mapParam.put("bankCoNo", bankCoNo);
+            mapParam.put("outActNo", outActNo);
+            if (Validator.validateString(InqSdt)) {
+                mapParam.put("InqSdt", InqSdt);
+                hql.append(" AND STR_TO_DATE (fbkFiles.trndt, '%Y%m%d') >= STR_TO_DATE (:InqSdt, '%Y%m%d')");
             }
-            List<?> rs = new ArrayList<>();
-            rs = query.getResultList();
-            for (Object item : rs) {
-                if (!hql.contains("JOIN")) {
-                    ht002InfoList.add((HT002Info) item);
-                } else {
-                    Object[] row = (Object[]) item;
-                    ht002InfoList.add((HT002Info) row[0]);
-                }
+            if (Validator.validateString(InqEdt)) {
+                mapParam.put("InqEdt", InqEdt);
+                hql.append(" AND STR_TO_DATE (fbkFiles.trndt, '%Y%m%d') =< STR_TO_DATE (:InqEdt, '%Y%m%d')");
+            }
+            System.out.println(hql.toString());
+            Query query = entityManager.createQuery(hql.toString());
+            for (Map.Entry<String, String> entry : mapParam.entrySet()) {
+                query.setParameter(entry.getKey(), entry.getValue());
             }
 
+            List<?> rs = query.getResultList();
+            for (int i = 0; i < rs.size(); ++i) {
+                Object[] row = (Object[]) rs.get(i);
+                HT002DTO ht002DTO = new HT002DTO();
+                ht002DTO = convertToDTO((HT002Info) row[0]);
+                ht002DTOS.add(ht002DTO);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return ht002InfoList;
+        return ht002DTOS;
+    }
+
+    private HT002DTO convertToDTO(HT002Info ht002Info) {
+        HT002DTO ht002DTO = new HT002DTO();
+        ht002DTO.setActNo(ht002Info.getActno());
+        ht002DTO.setTrnDt(ht002Info.getTrndt());
+        ht002DTO.setTrnTm(ht002Info.getTrntm());
+        ht002DTO.setTrnAmt(ht002Info.getTrnamt());
+        ht002DTO.setTrnAfBl(ht002Info.getTrnafbl());
+        ht002DTO.setTrnType(ht002Info.getTrntype());
+        ht002DTO.setRefTxt(ht002Info.getReftxt());
+        ht002DTO.setTrmPrcSrno(ht002Info.getTrmprcsrno());
+        ht002DTO.setVirActNo(ht002Info.getViractno());
+        return ht002DTO;
     }
 
     @Override

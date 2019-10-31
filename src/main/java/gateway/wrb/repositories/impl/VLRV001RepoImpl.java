@@ -34,14 +34,16 @@ public class VLRV001RepoImpl implements VLR001Repo {
         List<RV001DTO> vlr001InfoList = new ArrayList<>();
 
         StringBuilder hql = new StringBuilder("FROM VLR001Info AS vlr001 INNER JOIN FbkFilesInfo AS fbkFiles " +
-                " ON vlr001.fbkname = fbkFiles.fbkname WHERE fbkFiles.conos = :bankCoNo  AND vlr001.virActNo = :outActNo" +
-                " AND STR_TO_DATE (fbkFiles.trndt, '%Y%m%d') >= STR_TO_DATE (:bankRsvSdt, '%Y%m%d')");
+                " ON vlr001.fbkname = fbkFiles.fbkname WHERE fbkFiles.conos = :bankCoNo  AND vlr001.virActNo = :outActNo");
         System.out.println(hql);
         try {
             Map<String, String> mapParam = new LinkedHashMap<>();
             mapParam.put("bankCoNo", bankCoNo);
             mapParam.put("outActNo", outActNo);
-            mapParam.put("bankRsvSdt", bankRsvSdt);
+            if (Validator.validateString(bankRsvSdt)) {
+                mapParam.put("bankRsvSdt", bankRsvEdt);
+                hql.append(" AND STR_TO_DATE (fbkFiles.trndt, '%Y%m%d') >= STR_TO_DATE (:bankRsvSdt, '%Y%m%d')");
+            }
             if (Validator.validateString(bankRsvEdt)) {
                 mapParam.put("bankRsvEdt", bankRsvEdt);
                 hql.append(" AND STR_TO_DATE (fbkFiles.trndt, '%Y%m%d') <= STR_TO_DATE (:bankRsvEdt, '%Y%m%d')");

@@ -95,6 +95,23 @@ public class FbkFilesServiceImpl implements FbkFilesService {
                 Map<String, FbkFilesInfo> fbkFilesInfoMap = new HashMap<>();
                 fbkFilesInfoMap.put(fbkFilesInfo.getFiletype(), fbkFilesInfo);
                 listFbkFiles.add(fbkFilesInfoMap);
+            } else if (fileName.startsWith(fbkConfig.getHeaderCcr()) && fileName.endsWith(fbkConfig.getFbkType())) {
+                fbkFilesInfo.setFbkname(fileName);
+                String dateTime = fileName.substring(12, 20);
+                fbkFilesInfo.setTrndt(dateTime);
+
+                if (fileName.toUpperCase().contains(FileType.RB001_199)
+                        || (fileName.toUpperCase().contains(FileType.RB001_299))) {
+                    fbkFilesInfo.setFiletype(FileType.RB001);
+                }
+
+                // saving to DB
+                // fbkFilesRepo.addFbkFile(fbkFilesInfo);
+
+                // add to list FBK
+                Map<String, FbkFilesInfo> fbkFilesInfoMap = new HashMap<>();
+                fbkFilesInfoMap.put(fbkFilesInfo.getFiletype(), fbkFilesInfo);
+                listFbkFiles.add(fbkFilesInfoMap);
             }
         }
         return listFbkFiles;

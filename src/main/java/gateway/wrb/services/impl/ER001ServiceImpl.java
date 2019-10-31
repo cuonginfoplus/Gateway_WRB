@@ -1,5 +1,6 @@
 package gateway.wrb.services.impl;
 
+import gateway.wrb.config.BankConfig;
 import gateway.wrb.config.ER001Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.ER001Info;
@@ -16,12 +17,16 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 @Service
 public class ER001ServiceImpl implements ER001Service {
     public static final Logger logger = LoggerFactory.getLogger(ER001ServiceImpl.class);
+
+    @Autowired
+    BankConfig bankConfig;
 
     @Autowired
     ER001Config er001Config;
@@ -40,7 +45,14 @@ public class ER001ServiceImpl implements ER001Service {
 
     @Override
     public List<ER001Info> getER001(String orgCd, String bankCd, String bankCoNo, String noticeSdt, String noticeEdt) {
-        List<ER001Info> er001Infos = er001Repo.filterER001(orgCd, bankCd, bankCoNo, noticeSdt, noticeEdt);
+        String bankCode = bankConfig.getBankCode();
+        String orgCode = bankConfig.getOrgCode();
+        List<ER001Info> er001Infos = new ArrayList<>();
+        if (!bankCode.equals(bankCd) || !orgCode.equals(orgCd)) {
+            return er001Infos;
+        } else {
+            er001Infos = er001Repo.filterER001(orgCd, bankCd, bankCoNo, noticeSdt, noticeEdt);
+        }
         return er001Infos;
     }
 
