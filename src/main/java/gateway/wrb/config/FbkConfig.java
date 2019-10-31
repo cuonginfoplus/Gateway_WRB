@@ -38,6 +38,9 @@ public class FbkConfig {
     @Value("${path.file.header_awa}")
     private String headerAwa;
 
+    @Value("${path.file.header_ccr}")
+    private String headerCcr;
+
     @Value("${path.fbksend}")
     private String fbkSend;
     //end

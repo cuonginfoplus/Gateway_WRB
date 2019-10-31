@@ -4,11 +4,7 @@ import gateway.wrb.config.FbkConfig;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.ER001Info;
 import gateway.wrb.domain.FbkFilesInfo;
-import gateway.wrb.domain.HT002Info;
-import gateway.wrb.domain.RV001Info;
-import gateway.wrb.model.RA001DTO;
-import gateway.wrb.model.RA001Model;
-import gateway.wrb.model.RB001Model;
+import gateway.wrb.model.*;
 import gateway.wrb.services.*;
 import gateway.wrb.util.DateUtils;
 import gateway.wrb.util.FileUtils;
@@ -81,43 +77,62 @@ public class FbkController {
         return new ResponseEntity<>(fbkList, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/rv001/info")
+    // V1.1 Virtual Info
+    @GetMapping(value = "/rv001")
     public ResponseEntity<?> getVLR001(
             @Valid @NotBlank @RequestParam(value = "orgCd", defaultValue = "") String orgCd,
             @Valid @NotBlank @RequestParam(value = "bankCd", defaultValue = "") String bankCd,
             @Valid @NotBlank @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo,
             @Valid @NotBlank @RequestParam(value = "outActNo", defaultValue = "") String outActNo,
-            @Valid @NotBlank @RequestParam(value = "bankRsvSdt", defaultValue = "") String bankRsvSdt,
-            @Valid @NotBlank @RequestParam(value = "bankRsvEdt", defaultValue = "") String bankRsvEdt
+            @RequestParam(value = "rgsTrnSdt", defaultValue = "") String bankRsvSdt,
+            @RequestParam(value = "rgsTrnEdt", defaultValue = "") String bankRsvEdt
     ) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
-        List<RV001Info> rv001InfoList = rv001Service.getRV001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
+//        List<RV001Info> rv001InfoList = rv001Service.getRV001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
+        List<RV001DTO> rv001DTOS = vlr001Service.getVLR001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
-        return new ResponseEntity<>(rv001InfoList, HttpStatus.OK);
+        return new ResponseEntity<>(rv001DTOS, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/ht002/info")
+    // V1.2 VirAccount Change
+    @PostMapping(value = "/rv002")
+    public ResponseEntity<?> postRV002(@RequestBody RV002Model model) {
+        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+        String sndDir = fbkConfig.getFbkSend();
+
+        if (model != null) {
+            //create request file
+            rv002Service.createRV002Req(sndDir, model);
+        }
+
+        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
+        return new ResponseEntity<>(DateUtils.dateYYYMMDDHHMMSS(), HttpStatus.OK);
+    }
+
+    // V1.3 Vir Account Trnx List
+    @GetMapping(value = "/ht002")
     public ResponseEntity<?> getHT002(
-            @RequestParam("orgCd") String orgCd,
-            @RequestParam("bankCd") String bankCd,
-            @RequestParam("bankCoNo") String bankCoNo,
-            @RequestParam("outActNo") String outActNo,
-            @RequestParam("InqSdt") String InqSdt,
-            @RequestParam("InqEdt") String InqEdt
+            @Valid @NotBlank @RequestParam(value = "orgCd", defaultValue = "") String orgCd,
+            @Valid @NotBlank @RequestParam(value = "bankCd", defaultValue = "") String bankCd,
+            @Valid @NotBlank @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo,
+            @Valid @NotBlank @RequestParam(value = "outActNo", defaultValue = "") String outActNo,
+            @RequestParam(value = "InqSdt", defaultValue = "") String InqSdt,
+            @RequestParam(value = "InqEdt", defaultValue = "") String InqEdt
     ) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
-        List<HT002Info> ht002InfoList = ht002Service.getHT002(orgCd, bankCd, bankCoNo, outActNo, InqSdt, InqEdt);
+        List<HT002DTO> ht002InfoList = ht002Service.getHT002(orgCd, bankCd, bankCoNo, outActNo, InqSdt, InqEdt);
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(ht002InfoList, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/ra001/info")
+    // V1.5 Final Admit List
+    @GetMapping(value = "/ra001")
     public ResponseEntity<?> getRA001(
-            @Valid @NotBlank @RequestParam("orgCd") String orgCd,
-            @Valid @NotBlank @RequestParam("bankCd") String bankCd,
-            @Valid @NotBlank @RequestParam("bankCoNo") String bankCoNo,
-            @Valid @NotBlank @RequestParam("bankRsvSdt") String bankRsvSdt,
-            @Valid @NotBlank @RequestParam("bankRsvEdt") String bankRsvEdt
+            @Valid @NotBlank @RequestParam(value = "orgCd", defaultValue = "") String orgCd,
+            @Valid @NotBlank @RequestParam(value = "bankCd", defaultValue = "") String bankCd,
+            @Valid @NotBlank @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo,
+            @RequestParam(value = "bankRsvSdt", defaultValue = "") String bankRsvSdt,
+            @RequestParam(value = "bankRsvEdt", defaultValue = "") String bankRsvEdt
     ) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<RA001DTO> ra001InfoList = ra001Service.getRA001(orgCd, bankCd, bankCoNo, bankRsvSdt, bankRsvEdt);
@@ -125,12 +140,40 @@ public class FbkController {
         return new ResponseEntity<>(ra001InfoList, HttpStatus.OK);
     }
 
+    // V1.7 Result Auto Tranfer
+    @GetMapping(value = "/rb001")
+    public ResponseEntity<?> getRB001(
+            @Valid @NotBlank @RequestParam(value = "orgCd", defaultValue = "") String orgCd,
+            @Valid @NotBlank @RequestParam(value = "bankCd", defaultValue = "") String bankCd,
+            @Valid @NotBlank @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo,
+            @Valid @NotBlank @RequestParam(value = "trnxId", defaultValue = "") String trnxId
+    ) {
+        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+        List<RB001DTO> er001Infos = rb001Service.getRB001(orgCd, bankCd, bankCoNo, trnxId);
+        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
+        return new ResponseEntity<>(er001Infos, HttpStatus.OK);
+    }
 
-    @GetMapping(value = "/er001/info")
+    //V1.8 Result Auto Tranfer Status
+    @GetMapping(value = "/rb001_s")
+    public ResponseEntity<?> getRB001_S(
+            @Valid @NotBlank @RequestParam(value = "orgCd", defaultValue = "") String orgCd,
+            @Valid @NotBlank @RequestParam(value = "bankCd", defaultValue = "") String bankCd,
+            @Valid @NotBlank @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo,
+            @Valid @NotBlank @RequestParam(value = "trnxId", defaultValue = "") String trnxId
+    ) {
+        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+        List<RB001SDTO> er001Infos = rb001Service.getRB001S(orgCd, bankCd, bankCoNo, trnxId);
+        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
+        return new ResponseEntity<>(er001Infos, HttpStatus.OK);
+    }
+
+    // V1.9 Exchange rate
+    @GetMapping(value = "/er001")
     public ResponseEntity<?> getER001(
-            @RequestParam("orgCd") String orgCd,
-            @RequestParam("bankCd") String bankCd,
-            @RequestParam("bankCoNo") String bankCoNo,
+            @Valid @NotBlank @RequestParam(value = "orgCd", defaultValue = "") String orgCd,
+            @Valid @NotBlank @RequestParam(value = "bankCd", defaultValue = "") String bankCd,
+            @Valid @NotBlank @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo,
             @RequestParam("noticeSdt") String noticeSdt,
             @RequestParam("noticeEdt") String noticeEdt
     ) {
@@ -140,7 +183,7 @@ public class FbkController {
         return new ResponseEntity<>(er001Infos, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/rv001")
+    @GetMapping(value = "/imprv001")
     public ResponseEntity<?> importrv001() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<FbkFilesInfo> rv001Files = new ArrayList<>();
@@ -170,7 +213,7 @@ public class FbkController {
         return new ResponseEntity<>(rv001Files, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/rv002")
+    @GetMapping(value = "/imprv002")
     public ResponseEntity<?> importrv002() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<FbkFilesInfo> rv002Files = new ArrayList<>();
@@ -199,7 +242,7 @@ public class FbkController {
         return new ResponseEntity<>(rv002Files, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/ht002")
+    @GetMapping(value = "/impht002")
     public ResponseEntity<?> importht002() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<FbkFilesInfo> ht002Files = new ArrayList<>();
@@ -235,7 +278,7 @@ public class FbkController {
      *
      * @return
      */
-    @GetMapping(value = "/er001")
+    @GetMapping(value = "/imper001")
     public ResponseEntity<?> importER001() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<FbkFilesInfo> er001Files = new ArrayList<>();
@@ -271,7 +314,7 @@ public class FbkController {
      *
      * @return
      */
-    @GetMapping(value = "/pr001")
+    @GetMapping(value = "/imppr001")
     public ResponseEntity<?> imporPR001() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<FbkFilesInfo> files = new ArrayList<>();
@@ -306,7 +349,7 @@ public class FbkController {
      *
      * @return
      */
-    @GetMapping(value = "/vlr001")
+    @GetMapping(value = "/impvlr001")
     public ResponseEntity<?> imporVLR001() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<FbkFilesInfo> files = new ArrayList<>();
@@ -341,7 +384,7 @@ public class FbkController {
      *
      * @return
      */
-    @GetMapping(value = "/ra001")
+    @GetMapping(value = "/impra001")
     public ResponseEntity<?> importRA001() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<FbkFilesInfo> ra001Files = new ArrayList<>();
@@ -366,6 +409,33 @@ public class FbkController {
         }
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(ra001Files, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/imprb001")
+    public ResponseEntity<?> importRB001() {
+        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+        List<FbkFilesInfo> rb001Files = new ArrayList<>();
+        String directory = fbkConfig.getFbkPath();
+        List<Map<String, FbkFilesInfo>> fbkFiles = fbkFilesService.getFbkFiles(directory);
+
+        for (int i = 0; i < fbkFiles.size(); i++) {
+            Map<String, FbkFilesInfo> filesInfoMap = fbkFiles.get(i);
+            FbkFilesInfo info = filesInfoMap.get(FileType.RB001);
+            if (Validator.validateObject(info) && !fbkFilesService.isFbkFileExist(info)) {
+                rb001Service.importRB001(info); // add FBK file to DB and RA001info to DB
+                rb001Files.add(info);
+
+                // Copy and Delete
+                FileUtils fileUtils = new FileUtils();
+                fileUtils.moveFile(info.getFullfbkpath(), fbkConfig.getFbkPathBackup(), info.getFbkname());
+            }
+        }
+
+        if (rb001Files.isEmpty()) {
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
+        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
+        return new ResponseEntity<>(rb001Files, HttpStatus.OK);
     }
 
     /**

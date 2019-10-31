@@ -2,6 +2,7 @@ package gateway.wrb.repositories;
 
 
 import gateway.wrb.domain.HT002Info;
+import gateway.wrb.model.HT002DTO;
 
 import java.util.List;
 
@@ -18,5 +19,5 @@ public interface HT002Repo {
                          String brCd, String chkAmt, String trnType, String particular, String depSeq, String status, String channelType,
                          String trnSrno, String destAccount, String recieveName, String refTxt, String depRmk, String trmPrcSrno);
 
-    List<HT002Info> filterHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt);
+    List<HT002DTO> filterHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String InqSdt, String InqEdt);
 }

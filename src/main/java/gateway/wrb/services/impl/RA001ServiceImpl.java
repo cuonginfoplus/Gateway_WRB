@@ -340,15 +340,15 @@ public class RA001ServiceImpl implements RA001Service {
             seqCache.addItem(new SeqModel("fbk_awa_099_" + strCurrDate, 1));
         }
         SeqModel nextSeq = seqCache.getItem("fbk_awa_099_" + strCurrDate);
-        seq = StringUtils.padLeftZeros(String.valueOf(nextSeq.getSeqValue()), 3);
-
+        if (Validator.validate(nextSeq)) {
+            seq = StringUtils.padLeftZeros(String.valueOf(nextSeq.getSeqValue()), 3);
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("fbk_awa_099_");
         sb.append(strCurrDate + "_");
         sb.append(customerCode + "_");
         sb.append(seq);
         sb.append(".dat");
-
         return sb.toString();
     }
 }

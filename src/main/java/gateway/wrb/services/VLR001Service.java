@@ -2,6 +2,7 @@ package gateway.wrb.services;
 
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.VLR001Info;
+import gateway.wrb.model.RV001DTO;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public interface VLR001Service {
 
     List<VLR001Info> getAllVLR001();
 
-    List<VLR001Info> getVLR001(String orgCd, String bankCd, String bankCoNo, String outActNo, String rgsTrnSdt, String rgsTrnEdt);
+    List<RV001DTO> getVLR001(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt);
 
     void updateVLR001(VLR001Info info);
 

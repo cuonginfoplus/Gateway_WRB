@@ -4,6 +4,7 @@ import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.RA001Info;
 import gateway.wrb.model.RA001DTO;
 import gateway.wrb.repositories.RA001Repo;
+import gateway.wrb.util.Validator;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,7 +12,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Repository
@@ -42,20 +45,25 @@ public class RA001RepoImpl implements RA001Repo {
 
     @Override
     public List<RA001DTO> filterRA001(String orgCd, String bankCd, String bankCoNo, String bankRsvSdt, String bankRsvEdt) {
-        List<?> rs = new ArrayList<>();
         List<RA001DTO> ra001DTOList = new ArrayList<>();
-        String hql = "FROM RA001Info AS ra001 INNER JOIN FbkFilesInfo AS fbkFiles" +
+        StringBuilder hql = new StringBuilder("FROM RA001Info AS ra001 INNER JOIN FbkFilesInfo AS fbkFiles" +
                 " ON ra001.fbkname = fbkFiles.fbkname WHERE fbkFiles.conos = :bankCoNo" +
                 " AND STR_TO_DATE (fbkFiles.trndt, '%Y%m%d') >= STR_TO_DATE (:bankRsvSdt, '%Y%m%d')" +
-                " AND STR_TO_DATE (fbkFiles.trndt, '%Y%m%d') <= STR_TO_DATE (:bankRsvEdt, '%Y%m%d')" +
-                " AND (ra001.status = 'SUC01' OR ra001.status = 'CAN01')";
-        System.out.println(hql);
+                " AND (ra001.status = 'SUC01' OR ra001.status = 'CAN01')");
         try {
-            Query query = entityManager.createQuery(hql);
-            query.setParameter("bankCoNo", bankCoNo);
-            query.setParameter("bankRsvSdt", bankRsvSdt);
-            query.setParameter("bankRsvEdt", bankRsvEdt);
-            rs = query.getResultList();
+            Map<String, String> mapParam = new LinkedHashMap<>();
+            mapParam.put("bankCoNo", bankCoNo);
+            mapParam.put("bankRsvSdt", bankRsvSdt);
+            if (Validator.validateString(bankRsvEdt)) {
+                mapParam.put("bankRsvEdt", bankRsvEdt);
+                hql.append(" AND STR_TO_DATE (fbkFiles.trndt, '%Y%m%d') <= STR_TO_DATE (:bankRsvEdt, '%Y%m%d')");
+            }
+            System.out.println(hql.toString());
+            Query query = entityManager.createQuery(hql.toString());
+            for (Map.Entry<String, String> entry : mapParam.entrySet()) {
+                query.setParameter(entry.getKey(), entry.getValue());
+            }
+            List<?> rs = query.getResultList();
             for (int i = 0; i < rs.size(); ++i) {
                 Object[] row = (Object[]) rs.get(i);
                 RA001DTO ra001DTO = new RA001DTO();

@@ -13,6 +13,7 @@ path:
     header_snd: fbk_snd
     header_vir: fbk_vir
     header_awa: fbk_awa
+    header_ccr: fbk_ccr
 
 bank:
   code: 970457

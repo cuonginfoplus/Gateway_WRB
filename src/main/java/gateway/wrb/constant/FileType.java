@@ -12,7 +12,9 @@ public class FileType {
     public static final String RA001 = "RA001";
     public static final String RA001_199 = "AWA_199";
     public static final String RA001_299 = "AWA_299";
-
+    public static final String RB001 = "RB001";
+    public static final String RB001_199 = "CCR_199";
+    public static final String RB001_299 = "CCR_299";
     public static final String PREFIX_START = "S";
     public static final String PREFIX_CONTENT = "D";
     public static final String PREFIX_END = "E";

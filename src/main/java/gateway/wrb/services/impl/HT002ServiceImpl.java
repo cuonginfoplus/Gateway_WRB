@@ -5,7 +5,7 @@ import gateway.wrb.config.HT002Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.HT002Info;
-import gateway.wrb.domain.RV001Info;
+import gateway.wrb.model.HT002DTO;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.HT002Repo;
 import gateway.wrb.services.HT002Service;
@@ -42,17 +42,17 @@ public class HT002ServiceImpl implements HT002Service {
     }
 
     @Override
-    public List<HT002Info> getHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt) {
+    public List<HT002DTO> getHT002(String orgCd, String bankCd, String bankCoNo, String outActNo, String InqSdt, String InqEdt) {
         String bankCode = bankConfig.getBankCode();
         String orgCode = bankConfig.getOrgCode();
-        List<HT002Info> ht002InfoList = new ArrayList<>();
+        List<HT002DTO> ht002DTOS = new ArrayList<>();
 
         if (!bankCode.equals(bankCd) || !orgCode.equals(orgCd)) {
-            return ht002InfoList;
+            return ht002DTOS;
         } else {
-            ht002InfoList = ht002Repo.filterHT002(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
+            ht002DTOS = ht002Repo.filterHT002(orgCd, bankCd, bankCoNo, outActNo, InqSdt, InqEdt);
         }
-        return ht002InfoList;
+        return ht002DTOS;
     }
 
     @Override

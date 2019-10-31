@@ -4,17 +4,23 @@ import gateway.wrb.config.RV002Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.RV002Info;
+import gateway.wrb.model.RV002Model;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.RV002Repo;
 import gateway.wrb.services.RV002Service;
+import gateway.wrb.util.AppConst;
+import gateway.wrb.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -157,5 +163,35 @@ public class RV002ServiceImpl implements RV002Service {
     public boolean isRV002exist(RV002Info rv002Info) {
         return rv002Repo.isRV002Exist(rv002Info.getMsgdscd(), rv002Info.getOutactno(), rv002Info.getViractno(), rv002Info.getReccodcd(),
                 rv002Info.getTrnavlsdt(), rv002Info.getTrnavledt(), rv002Info.getTrnavlstm(), rv002Info.getTrnavletm(), rv002Info.getTrnavlyn());
+    }
+
+    @Override
+    public void createRV002Req(String sndDir, RV002Model model) {
+        //parse model to string
+        Charset utf8 = StandardCharsets.UTF_8;
+        List<String> contents = new ArrayList<String>();
+
+        contents.add(createStartContent(model));
+        contents.add(getDataContent(model));
+
+        FileUtils utils = new FileUtils();
+        //Request: fbk_vir_101_yyyMMdd_FirmbankingCustomerCode(9 length)_sequenceNumber(3 length).dat(Customer->WooriBank)
+        //ex: fbk_vir_099_20190822_000000098_001.dat
+        String sndFileName = createSndFileName(AppConst.TYPE_RV002_REQ, model.getOrgCd());
+        String path = sndDir + sndFileName;
+        utils.createFile(path, contents);
+
+    }
+
+    private String createSndFileName(String typeRv002Req, String orgCd) {
+        return "";
+    }
+
+    private String getDataContent(RV002Model model) {
+        return "";
+    }
+
+    private String createStartContent(RV002Model model) {
+        return "";
     }
 }

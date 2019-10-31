@@ -4,6 +4,7 @@ import gateway.wrb.config.VLR001Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.VLR001Info;
+import gateway.wrb.model.RV001DTO;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.VLR001Repo;
 import gateway.wrb.services.VLR001Service;
@@ -185,9 +186,9 @@ public class VLR001ServiceImpl implements VLR001Service {
     }
 
     @Override
-    public List<VLR001Info> getVLR001(String orgCd, String bankCd, String bankCoNo, String outActNo, String rgsTrnSdt, String rgsTrnEdt) {
-        List<VLR001Info> rv001InfoList = vlr001Repo.filterVLRV001(orgCd, bankCd, bankCoNo, outActNo, rgsTrnSdt, rgsTrnEdt);
-        return rv001InfoList;
+    public List<RV001DTO> getVLR001(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt) {
+        List<RV001DTO> rv001DTOS = vlr001Repo.filterVLRV001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
+        return rv001DTOS;
     }
 
     @Override

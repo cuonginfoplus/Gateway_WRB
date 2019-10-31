@@ -1,6 +1,8 @@
 package gateway.wrb.repositories.impl;
 
+import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.VLR001Info;
+import gateway.wrb.model.RV001DTO;
 import gateway.wrb.repositories.VLR001Repo;
 import gateway.wrb.util.Validator;
 import org.springframework.stereotype.Repository;
@@ -28,13 +30,55 @@ public class VLRV001RepoImpl implements VLR001Repo {
     }
 
     @Override
-    public List<VLR001Info> filterVLRV001(String orgCd, String bankCd, String bankCoNo, String outActNo, String ent, String rgsTrnEdt) {
-        List<VLR001Info> vlr001InfoList = new ArrayList<>();
+    public List<RV001DTO> filterVLRV001(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt) {
+        List<RV001DTO> vlr001InfoList = new ArrayList<>();
 
-        String hql = "FROM VLR001Info";
-        vlr001InfoList = entityManager.createQuery(hql).getResultList();
+        StringBuilder hql = new StringBuilder("FROM VLR001Info AS vlr001 INNER JOIN FbkFilesInfo AS fbkFiles " +
+                " ON vlr001.fbkname = fbkFiles.fbkname WHERE fbkFiles.conos = :bankCoNo  AND vlr001.virActNo = :outActNo");
+        System.out.println(hql);
+        try {
+            Map<String, String> mapParam = new LinkedHashMap<>();
+            mapParam.put("bankCoNo", bankCoNo);
+            mapParam.put("outActNo", outActNo);
+            if (Validator.validateString(bankRsvSdt)) {
+                mapParam.put("bankRsvSdt", bankRsvEdt);
+                hql.append(" AND STR_TO_DATE (fbkFiles.trndt, '%Y%m%d') >= STR_TO_DATE (:bankRsvSdt, '%Y%m%d')");
+            }
+            if (Validator.validateString(bankRsvEdt)) {
+                mapParam.put("bankRsvEdt", bankRsvEdt);
+                hql.append(" AND STR_TO_DATE (fbkFiles.trndt, '%Y%m%d') <= STR_TO_DATE (:bankRsvEdt, '%Y%m%d')");
+            }
+            Query query = entityManager.createQuery(hql.toString());
+            for (Map.Entry<String, String> entry : mapParam.entrySet()) {
+                query.setParameter(entry.getKey(), entry.getValue());
+            }
+            List<?> rs = query.getResultList();
+            for (int i = 0; i < rs.size(); ++i) {
+                Object[] row = (Object[]) rs.get(i);
+                RV001DTO rv001DTO = new RV001DTO();
+                rv001DTO = castToDTO((VLR001Info) row[0]);
+                rv001DTO.setBankRcvDt(((FbkFilesInfo) row[1]).getTmsdts());
+                rv001DTO.setBankRcvTm(((FbkFilesInfo) row[1]).getTmstms());
+                vlr001InfoList.add(rv001DTO);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return vlr001InfoList;
+    }
+
+    private RV001DTO castToDTO(VLR001Info vlr001Info) {
+        RV001DTO rv001DTO = new RV001DTO();
+        rv001DTO.setVirActNo(vlr001Info.getVirActNo());
+        rv001DTO.setVractCusNm(vlr001Info.getVractCusNm());
+        rv001DTO.setTrnAvlSdt(vlr001Info.getTrnAvlSdt());
+        rv001DTO.setTrnAvlEdt(vlr001Info.getTrnAvlEdt());
+        rv001DTO.setTrnAvlStm(vlr001Info.getTrnAvlStm());
+        rv001DTO.setTrnAvlEtm(vlr001Info.getTrnAvlEtm());
+        rv001DTO.setRgsTrnDt(vlr001Info.getRgsTrnDt());
+        rv001DTO.setBankRcvDt(vlr001Info.getTrnAvlSdt());
+        return rv001DTO;
     }
 
     @Override
