@@ -5,7 +5,6 @@ import gateway.wrb.config.HT002Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.HT002Info;
-import gateway.wrb.domain.RV001Info;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.HT002Repo;
 import gateway.wrb.services.HT002Service;

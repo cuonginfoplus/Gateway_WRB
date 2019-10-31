@@ -5,10 +5,7 @@ import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.ER001Info;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.HT002Info;
-import gateway.wrb.domain.RV001Info;
-import gateway.wrb.model.RA001DTO;
-import gateway.wrb.model.RA001Model;
-import gateway.wrb.model.RB001Model;
+import gateway.wrb.model.*;
 import gateway.wrb.services.*;
 import gateway.wrb.util.DateUtils;
 import gateway.wrb.util.FileUtils;
@@ -86,24 +83,25 @@ public class FbkController {
             @Valid @NotBlank @RequestParam(value = "orgCd", defaultValue = "") String orgCd,
             @Valid @NotBlank @RequestParam(value = "bankCd", defaultValue = "") String bankCd,
             @Valid @NotBlank @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo,
-            @Valid @NotBlank @RequestParam(value = "outActNo", defaultValue = "") String outActNo,
+            @RequestParam(value = "outActNo", defaultValue = "") String outActNo,
             @Valid @NotBlank @RequestParam(value = "bankRsvSdt", defaultValue = "") String bankRsvSdt,
-            @Valid @NotBlank @RequestParam(value = "bankRsvEdt", defaultValue = "") String bankRsvEdt
+            @RequestParam(value = "bankRsvEdt", defaultValue = "") String bankRsvEdt
     ) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
-        List<RV001Info> rv001InfoList = rv001Service.getRV001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
+//        List<RV001Info> rv001InfoList = rv001Service.getRV001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
+        List<RV001DTO> rv001DTOS = vlr001Service.getVLR001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
-        return new ResponseEntity<>(rv001InfoList, HttpStatus.OK);
+        return new ResponseEntity<>(rv001DTOS, HttpStatus.OK);
     }
 
     @GetMapping(value = "/ht002/info")
     public ResponseEntity<?> getHT002(
-            @RequestParam("orgCd") String orgCd,
-            @RequestParam("bankCd") String bankCd,
-            @RequestParam("bankCoNo") String bankCoNo,
-            @RequestParam("outActNo") String outActNo,
-            @RequestParam("InqSdt") String InqSdt,
-            @RequestParam("InqEdt") String InqEdt
+            @Valid @NotBlank @RequestParam(value = "orgCd", defaultValue = "") String orgCd,
+            @Valid @NotBlank @RequestParam(value = "bankCd", defaultValue = "") String bankCd,
+            @Valid @NotBlank @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo,
+            @Valid @NotBlank @RequestParam(value = "outActNo", defaultValue = "") String outActNo,
+            @Valid @NotBlank @RequestParam(value = "InqSdt", defaultValue = "") String InqSdt,
+            @RequestParam(value = "InqEdt", defaultValue = "") String InqEdt
     ) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<HT002Info> ht002InfoList = ht002Service.getHT002(orgCd, bankCd, bankCoNo, outActNo, InqSdt, InqEdt);
@@ -113,11 +111,11 @@ public class FbkController {
 
     @GetMapping(value = "/ra001/info")
     public ResponseEntity<?> getRA001(
-            @Valid @NotBlank @RequestParam("orgCd") String orgCd,
-            @Valid @NotBlank @RequestParam("bankCd") String bankCd,
-            @Valid @NotBlank @RequestParam("bankCoNo") String bankCoNo,
-            @Valid @NotBlank @RequestParam("bankRsvSdt") String bankRsvSdt,
-            @Valid @NotBlank @RequestParam("bankRsvEdt") String bankRsvEdt
+            @Valid @NotBlank @RequestParam(value = "orgCd", defaultValue = "") String orgCd,
+            @Valid @NotBlank @RequestParam(value = "bankCd", defaultValue = "") String bankCd,
+            @Valid @NotBlank @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo,
+            @Valid @NotBlank @RequestParam(value = "bankRsvSdt", defaultValue = "") String bankRsvSdt,
+            @RequestParam(value = "bankRsvEdt", defaultValue = "") String bankRsvEdt
     ) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<RA001DTO> ra001InfoList = ra001Service.getRA001(orgCd, bankCd, bankCoNo, bankRsvSdt, bankRsvEdt);
@@ -125,12 +123,11 @@ public class FbkController {
         return new ResponseEntity<>(ra001InfoList, HttpStatus.OK);
     }
 
-
     @GetMapping(value = "/er001/info")
     public ResponseEntity<?> getER001(
-            @RequestParam("orgCd") String orgCd,
-            @RequestParam("bankCd") String bankCd,
-            @RequestParam("bankCoNo") String bankCoNo,
+            @Valid @NotBlank @RequestParam(value = "orgCd", defaultValue = "") String orgCd,
+            @Valid @NotBlank @RequestParam(value = "bankCd", defaultValue = "") String bankCd,
+            @Valid @NotBlank @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo,
             @RequestParam("noticeSdt") String noticeSdt,
             @RequestParam("noticeEdt") String noticeEdt
     ) {
