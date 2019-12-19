@@ -2,23 +2,13 @@ package gateway.wrb.model;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class RA001Model {
     private String orgCd;
     private String bankCd;
     private String bankCoNo;
-    private String wdrActNo;
-    private String msgTrno;
-    private String trnStDt;
-    private String trnClsDt;
-    private String trnType;
-    private String curCd;
-    private String rcpAm;
-    private String rcpCnt;
-    private String outParticular;
-    private String inParticular;
-    private String cus_id_no_cd;
-    private String cus_id_no;
-    private String isuDt;
-    private String vld_edt;
+    private String outActNo;
+    private List<RA001AccModel> actList;
 }

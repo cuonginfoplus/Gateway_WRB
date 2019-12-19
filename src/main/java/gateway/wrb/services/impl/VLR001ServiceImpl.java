@@ -4,6 +4,7 @@ import gateway.wrb.config.VLR001Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.VLR001Info;
+import gateway.wrb.domain.VLR001SInfo;
 import gateway.wrb.model.RV001DTO;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.VLR001Repo;
@@ -76,16 +77,27 @@ public class VLR001ServiceImpl implements VLR001Service {
                         line = line.substring(tmsTmLength);
                         String coNo = line.substring(0, coNoLength);
                         line = line.substring(coNoLength);
-                        //String outActNo = line.substring(0, outActNoLength);
+                        String outActNo = line.substring(0, outActNoLength);
                         line = line.substring(outActNoLength);
-                        //String dataCnt = line.substring(0, dataCntLength);
+                        String dataCnt = line.substring(0, dataCntLength);
                         line = line.substring(dataCntLength);
-                        //String etcAr = line.substring(0, etcArLength);
+                        String etcAr = line.substring(0, etcArLength);
                         line = line.substring(etcArLength);
+
+                        VLR001SInfo vlr001SInfo = new VLR001SInfo();
+                        vlr001SInfo.setMsgDscd("S");
+                        vlr001SInfo.setTmsDt(tmsDt);
+                        vlr001SInfo.setTmsTm(tmsTm);
+                        vlr001SInfo.setCoNo(coNo);
+                        vlr001SInfo.setOutActNo(outActNo);
+                        vlr001SInfo.setDataCnt(dataCnt);
+                        vlr001SInfo.setEtcAr(etcAr);
+                        vlr001SInfo.setFbkname(fbkFilesInfo.getFbkname());
 
                         fbkFilesInfo.setTmsdts(tmsDt);
                         fbkFilesInfo.setTmstms(tmsTm);
                         fbkFilesInfo.setConos(coNo);
+                        vlr001Repo.addVLR001S(vlr001SInfo);
 
                     } else if (line.startsWith(FileType.PREFIX_CONTENT)) {
                         String msgDscD = line.substring(0, msgDscdLength);

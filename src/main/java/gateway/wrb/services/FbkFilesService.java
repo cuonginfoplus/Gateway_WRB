@@ -11,4 +11,6 @@ public interface FbkFilesService {
     FbkFilesInfo getFbkFiles(long id);
 
     boolean isFbkFileExist(FbkFilesInfo fbkFilesInfo);
+
+    public List<String> getSendFbkFiles(String directory);
 }

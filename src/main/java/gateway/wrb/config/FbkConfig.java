@@ -13,6 +13,12 @@ public class FbkConfig {
     @Value("${path.fbkbackup}")
     private String fbkPathBackup;
 
+    @Value("${path.fbktowrb}")
+    private String fbktowrb;
+
+    @Value("${path.fbkfromwrb}")
+    private String fbkfromwrb;
+
     @Value("${path.file.type}")
     private String fbkType;
 
@@ -43,6 +49,9 @@ public class FbkConfig {
 
     @Value("${path.fbksend}")
     private String fbkSend;
+
+    @Value("${path.fbksendbk}")
+    private String fbkSendBk;
     //end
 
 }

@@ -2,14 +2,18 @@ package gateway.wrb.repositories.impl;
 
 import gateway.wrb.domain.ER001Info;
 import gateway.wrb.repositories.ER001Repo;
+import gateway.wrb.util.Validator;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Repository
@@ -55,8 +59,30 @@ public class ER001RepoImpl implements ER001Repo {
     @Override
     public List<ER001Info> filterER001(String orgCd, String bankCd, String bankCoNo, String noticeSdt, String noticeEdt) {
         List<ER001Info> er001Infos = new ArrayList<>();
-        String hql = "FROM ER001Info";
-        er001Infos = entityManager.createQuery(hql).getResultList();
+        try {
+            StringBuilder hql = new StringBuilder("FROM ER001Info as er001 " +
+                    "INNER JOIN FbkFilesInfo AS fbkFiles ON er001.fbkname = fbkFiles.fbkname ");
+            Map<String, String> mapParam = new LinkedHashMap<>();
+            if (Validator.validateString(noticeSdt)) {
+                mapParam.put("noticeSdt", noticeSdt);
+                hql.append(" AND STR_TO_DATE(fbkFiles.trndt, '%Y%m%d') >= STR_TO_DATE(:noticeSdt, '%Y%m%d')");
+            }
+            if (Validator.validateString(noticeEdt)) {
+                mapParam.put("noticeEdt", noticeEdt);
+                hql.append(" AND STR_TO_DATE(fbkFiles.trndt, '%Y%m%d') <= STR_TO_DATE(:noticeEdt, '%Y%m%d')");
+            }
+            Query query = entityManager.createQuery(hql.toString());
+            for (Map.Entry<String, String> entry : mapParam.entrySet()) {
+                query.setParameter(entry.getKey(), entry.getValue());
+            }
+            List<?> rs = query.getResultList();
+            for (int i = 0; i < rs.size(); ++i) {
+                Object[] row = (Object[]) rs.get(i);
+                er001Infos.add((ER001Info) row[0]);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return er001Infos;
     }
 }

@@ -5,12 +5,13 @@ import gateway.wrb.domain.RA001Info;
 import gateway.wrb.model.RA001DTO;
 import gateway.wrb.model.RA001Model;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface RA001Service {
     List<RA001Info> getAllRA001();
 
-    List<RA001DTO> getRA001(String orgCd, String bankCd, String bankCoNo, String bankRsvSdt, String bankRsvEdt);
+    List<RA001DTO> getRA001(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt);
 
     void importRA001(FbkFilesInfo fbkFilesInfo);
 
@@ -20,6 +21,6 @@ public interface RA001Service {
 
     boolean isRA001exist(RA001Info RA001Info);
 
-    void createRA001Req(String dir, RA001Model model);
+    void createRA001Req(String dir, RA001Model model) throws IOException;
 
 }

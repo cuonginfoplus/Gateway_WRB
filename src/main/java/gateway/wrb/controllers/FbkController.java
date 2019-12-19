@@ -8,19 +8,24 @@ import gateway.wrb.model.*;
 import gateway.wrb.services.*;
 import gateway.wrb.util.DateUtils;
 import gateway.wrb.util.FileUtils;
+import gateway.wrb.util.SftpUtils;
 import gateway.wrb.util.Validator;
 import lombok.extern.log4j.Log4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -89,14 +94,15 @@ public class FbkController {
     ) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
 //        List<RV001Info> rv001InfoList = rv001Service.getRV001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
+
         List<RV001DTO> rv001DTOS = vlr001Service.getVLR001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(rv001DTOS, HttpStatus.OK);
     }
 
     // V1.2 VirAccount Change
-    @PostMapping(value = "/rv002")
-    public ResponseEntity<?> postRV002(@RequestBody RV002Model model) {
+    @PostMapping(value = "/rv002", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> postRV002(@RequestBody RV002Model model) throws IOException {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         String sndDir = fbkConfig.getFbkSend();
 
@@ -131,11 +137,12 @@ public class FbkController {
             @Valid @NotBlank @RequestParam(value = "orgCd", defaultValue = "") String orgCd,
             @Valid @NotBlank @RequestParam(value = "bankCd", defaultValue = "") String bankCd,
             @Valid @NotBlank @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo,
+            @RequestParam(value = "outActNo", defaultValue = "") String outActNo,
             @RequestParam(value = "bankRsvSdt", defaultValue = "") String bankRsvSdt,
             @RequestParam(value = "bankRsvEdt", defaultValue = "") String bankRsvEdt
     ) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
-        List<RA001DTO> ra001InfoList = ra001Service.getRA001(orgCd, bankCd, bankCoNo, bankRsvSdt, bankRsvEdt);
+        List<RA001DTO> ra001InfoList = ra001Service.getRA001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(ra001InfoList, HttpStatus.OK);
     }
@@ -183,6 +190,7 @@ public class FbkController {
         return new ResponseEntity<>(er001Infos, HttpStatus.OK);
     }
 
+    @Scheduled(cron = "0 9 12,19 * * *")
     @GetMapping(value = "/imprv001")
     public ResponseEntity<?> importrv001() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
@@ -213,6 +221,7 @@ public class FbkController {
         return new ResponseEntity<>(rv001Files, HttpStatus.OK);
     }
 
+    @Scheduled(cron = "0 4 12,19 * * *")
     @GetMapping(value = "/imprv002")
     public ResponseEntity<?> importrv002() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
@@ -242,6 +251,7 @@ public class FbkController {
         return new ResponseEntity<>(rv002Files, HttpStatus.OK);
     }
 
+    @Scheduled(cron = "0 13 12,19 * * *")
     @GetMapping(value = "/impht002")
     public ResponseEntity<?> importht002() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
@@ -278,6 +288,7 @@ public class FbkController {
      *
      * @return
      */
+    @Scheduled(cron = "0 8 12,19 * * *")
     @GetMapping(value = "/imper001")
     public ResponseEntity<?> importER001() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
@@ -314,6 +325,7 @@ public class FbkController {
      *
      * @return
      */
+    @Scheduled(cron = "0 3 12,19 * * *")
     @GetMapping(value = "/imppr001")
     public ResponseEntity<?> imporPR001() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
@@ -349,6 +361,7 @@ public class FbkController {
      *
      * @return
      */
+    @Scheduled(cron = "0 15 12,19 * * *")
     @GetMapping(value = "/impvlr001")
     public ResponseEntity<?> imporVLR001() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
@@ -384,6 +397,8 @@ public class FbkController {
      *
      * @return
      */
+
+    @Scheduled(cron = "0 10 12,19 * * *")
     @GetMapping(value = "/impra001")
     public ResponseEntity<?> importRA001() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
@@ -411,6 +426,7 @@ public class FbkController {
         return new ResponseEntity<>(ra001Files, HttpStatus.OK);
     }
 
+    @Scheduled(cron = "0 5 12,19 * * *")
     @GetMapping(value = "/imprb001")
     public ResponseEntity<?> importRB001() {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
@@ -441,11 +457,11 @@ public class FbkController {
     /**
      * anhtn 20190911 post RA001 Customer Withdrawal Request File
      *
-     * @param model: RA001Model
+     * @param model: List<RA001Model>
      * @return
      */
-    @PostMapping(value = "/ra001")
-    public ResponseEntity<?> postRA001(@RequestBody RA001Model model) {
+    @PostMapping(value = "/ra001", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> postRA001(@RequestBody RA001Model model) throws IOException {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         String sndDir = fbkConfig.getFbkSend();
 
@@ -476,17 +492,35 @@ public class FbkController {
         return new ResponseEntity<>(DateUtils.dateYYYMMDDHHMMSS(), HttpStatus.OK);
     }
 
-//    @Scheduled(fixedRate = 2000)
-//    public void scheduleFbkFiles() {
+    // Crawl FBK file from Woori server
+    @Scheduled(cron = "0 0 12,19 * * *")
+    public void scheduleFbkFiles() {
+        // get Files from SFTP
+        SftpUtils sftpUtils = new SftpUtils();
+        String SFTPHOST = fbkConfig.getSftphost();
+        String SFTPPORT = fbkConfig.getSftpport();
+        String SFTPUSER = fbkConfig.getSftuser();
+        String SFTPPASS = fbkConfig.getSftpassword();
+        String SFTPWORKINGDIR = fbkConfig.getFbkPath();
+        String SFTPREMOTE = fbkConfig.getFbktowrb();
+        sftpUtils.getFilesSftp(SFTPHOST, SFTPPORT, SFTPUSER, SFTPPASS, SFTPWORKINGDIR, SFTPREMOTE);
+    }
 
-//        // get Files from SFTP
-//        SftpUtils sftpUtils = new SftpUtils();
-//        String SFTPHOST = fbkConfig.getSftphost();
-//        String SFTPPORT = fbkConfig.getSftpport();
-//        String SFTPUSER = fbkConfig.getSftuser();
-//        String SFTPPASS = fbkConfig.getSftpassword();
-//        String SFTPWORKINGDIR = fbkConfig.getFbkPath();
-//        sftpUtils.getFilesSftp(SFTPHOST, SFTPPORT, SFTPUSER, SFTPPASS, SFTPWORKINGDIR);
-//    }
+    // Put file to Woori Serverw
+    @Scheduled(cron = "0 30 12,19 * * *")
+    public void schedulePutFbkFiles() {
+        SftpUtils sftpUtils = new SftpUtils();
+        String fbkSend = fbkConfig.getFbkSend();
+        List<String> fbkFiles = fbkFilesService.getSendFbkFiles(fbkSend);
+        for (String fbkfile : fbkFiles) {
+            System.out.println(fbkfile);
+            File file = new File(fbkfile);
+            sftpUtils.putFileSftp(fbkConfig.getSftphost(), fbkConfig.getSftpport(), fbkConfig.getSftuser(), fbkConfig.getSftpassword(), file, fbkConfig.getFbkfromwrb());
 
+            // Copy and Delete
+            FileUtils fileUtils = new FileUtils();
+            String fileName = fbkfile.substring(fbkfile.lastIndexOf('/') + 1);
+            fileUtils.moveFile(fbkfile, fbkConfig.getFbkSendBk(), fileName);
+        }
+    }
 }

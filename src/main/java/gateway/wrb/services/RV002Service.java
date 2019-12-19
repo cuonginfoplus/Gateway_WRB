@@ -18,7 +18,7 @@ public interface RV002Service {
 
     void deleteRV002(long id);
 
-    boolean isRV002exist(RV002Info rv002Info);
+    boolean isRV002exist(RV002Info info);
 
     void createRV002Req(String sndDir, RV002Model model);
 }

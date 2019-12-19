@@ -37,7 +37,7 @@ public class FileUtils {
                 Files.createDirectories(path);
             }
 
-            File newFile = new File(outputFile + "\\" + fileName + ".bak");
+            File newFile = new File(outputFile + fileName + ".bak");
 
             inStream = new FileInputStream(afile);
             outStream = new FileOutputStream(newFile);
@@ -63,8 +63,6 @@ public class FileUtils {
         try (Writer writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(dir), utf8)
         )) {
-            writer.write(content + "\n");
-
             for (String s : content) {
                 writer.write(s + "\n");
             }

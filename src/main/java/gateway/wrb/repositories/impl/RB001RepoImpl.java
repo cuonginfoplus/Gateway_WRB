@@ -34,13 +34,9 @@ public class RB001RepoImpl implements RB001Repo {
 
     @Override
     public Integer isRB001Exist(String msgDscd, String seq, String outActNo, String curCd, String trnAm, String tobkDscd, String istDscd, String inCdAccGb, String rcvbk1Cd,
-                                String rcvbk2Cd, String rcvbkNm, String sndName, String rcvacDppeNm, String depRmk, String wdrRmk, String trnSrno, String status,
-                                String prcCd, String errCd, String refNo, String filler) {
+                                String rcvbk2Cd, String status, String refNo) {
         String hql = "FROM RB001Info WHERE msgDscd=:msgDscd and seq=:seq and outActNo=:outActNo and curCd=:curCd and trnAm=:trnAm and tobkDscd=:tobkDscd " +
-                " and istDscd=:istDscd and inCdAccGb=:inCdAccGb and rcvbk1Cd=:rcvbk1Cd " +
-                " and rcvbk2Cd:=rcvbk2Cd and rcvbkNm:=rcvbkNm and sndName:=sndName and rcvacDppeNm:=rcvacDppeNm " +
-                " and depRmk:=depRmk and wdrRmk:=wdrRmk and trnSrno:=trnSrno and status:=status " +
-                " and prcCd:=prcCd and errCd:=errCd and refNo:=refNo and filler:=filler";
+                " and istDscd=:istDscd and inCdAccGb=:inCdAccGb and rcvbk1Cd=:rcvbk1Cd and rcvbk2Cd=:rcvbk2Cd and status=:status and refNo=:refNo";
         List<RB001Info> rb001Infos = entityManager.createQuery(hql)
                 .setParameter("msgDscd", msgDscd)
                 .setParameter("seq", seq)
@@ -52,17 +48,8 @@ public class RB001RepoImpl implements RB001Repo {
                 .setParameter("inCdAccGb", inCdAccGb)
                 .setParameter("rcvbk1Cd", rcvbk1Cd)
                 .setParameter("rcvbk2Cd", rcvbk2Cd)
-                .setParameter("rcvbkNm", rcvbkNm)
-                .setParameter("sndName", sndName)
-                .setParameter("rcvacDppeNm", rcvacDppeNm)
-                .setParameter("depRmk", depRmk)
-                .setParameter("wdrRmk", wdrRmk)
-                .setParameter("trnSrno", trnSrno)
                 .setParameter("status", status)
-                .setParameter("prcCd", prcCd)
-                .setParameter("errCd", errCd)
                 .setParameter("refNo", refNo)
-                .setParameter("filler", filler)
                 .getResultList();
         return rb001Infos.size();
     }
