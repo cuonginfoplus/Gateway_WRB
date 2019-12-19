@@ -31,10 +31,4 @@ public class RV002Info implements Serializable {
     private String trnavlyn;
     private String corpreccompcode;
     private String filter;
-
-    private String msgdscde;
-    private String totcnte;
-    private String totreqcnte;
-    private String totreqamte;
-    private String fillere;
 }

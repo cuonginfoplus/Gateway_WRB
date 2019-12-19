@@ -48,15 +48,11 @@ public class RV002RepoImpl implements RV002Repo {
     }
 
     @Override
-    public boolean isRV002Exist(String msgDscd, String outActNo, String virActno, String recCodCd,
-                                String trnAvlSdt, String trnAvlEdt, String trnAvlStm, String trnAvlEtm, String trnAvlyn) {
+    public boolean isRV002Exist(String outActNo, String virActno, String recCodCd,
+                                String trnAvlSdt, String trnAvlEdt, String trnAvlStm, String trnAvlEtm) {
         Long count = 0l;
         String hql = "SELECT COUNT(*) FROM RV002Info as rv002 WHERE";
         Map<String, String> mapParam = new LinkedHashMap<>();
-        if (Validator.validateString(msgDscd)) {
-            mapParam.put("msgDscd", msgDscd);
-            hql = hql.concat(" rv002.msgdscd = :msgDscd AND");
-        }
         if (Validator.validateString(outActNo)) {
             mapParam.put("outActNo", outActNo);
             hql = hql.concat(" rv002.outactno = :outActNo AND");
@@ -84,10 +80,6 @@ public class RV002RepoImpl implements RV002Repo {
         if (Validator.validateString(trnAvlEtm)) {
             mapParam.put("trnAvlEtm", trnAvlEtm);
             hql = hql.concat(" rv002.trnavletm = :trnAvlEtm AND");
-        }
-        if (Validator.validateString(trnAvlyn)) {
-            mapParam.put("trnAvlyn", trnAvlyn);
-            hql = hql.concat(" rv002.trnavlyn = :trnAvlyn");
         }
         if (hql.endsWith("WHERE")) {
             hql = hql.replace("WHERE", "");

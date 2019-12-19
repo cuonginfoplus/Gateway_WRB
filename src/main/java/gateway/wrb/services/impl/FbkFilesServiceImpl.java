@@ -23,6 +23,18 @@ public class FbkFilesServiceImpl implements FbkFilesService {
     private FbkConfig fbkConfig;
 
     @Override
+    public List<String> getSendFbkFiles(String directory) {
+        List<String> sendFBKFiles = new ArrayList<>();
+        FileUtils util = new FileUtils();
+        List<String> listByName = util.getFilesDirectory(directory);
+        for (int i = 0; i < listByName.size(); i++) {
+            String fullFileName = listByName.get(i);
+            sendFBKFiles.add(fullFileName);
+        }
+        return sendFBKFiles;
+    }
+
+    @Override
     public List<Map<String, FbkFilesInfo>> getFbkFiles(String directory) {
         List<Map<String, FbkFilesInfo>> listFbkFiles = new ArrayList<>();
         FileUtils util = new FileUtils();

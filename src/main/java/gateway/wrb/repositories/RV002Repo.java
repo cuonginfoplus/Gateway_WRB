@@ -16,6 +16,6 @@ public interface RV002Repo {
 
     void deleteRV002(long id);
 
-    boolean isRV002Exist(String msgDscd, String outActNo, String virActno, String recCodCd, String trnAvlSdt, String trnAvlEdt,
-                         String trnAvlStm, String trnAvlEtm, String trnAvlyn);
+    boolean isRV002Exist(String outActNo, String virActno, String recCodCd, String trnAvlSdt, String trnAvlEdt,
+                         String trnAvlStm, String trnAvlEtm);
 }

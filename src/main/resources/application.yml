@@ -2,12 +2,15 @@ server:
   host: 118.70.245.193
   port: 22
   user: info_woori
-  password: Info!@34
+  password: Infoo!@34
 
 path:
-  fbk: /Users/macos/Downloads/FBK_files_exam/test_file/
-  fbkbackup: /Users/macos/Downloads/FBK_files_exam/test_file/Complete/
-  fbksend: /Users/macos/Downloads/FBK_files_exam/test_file/Send/
+  fbk: /root/WRB_Gateway/
+  fbkbackup: /root/WRB_Gateway/Complete/
+  fbksend: /root/WRB_Gateway/Send/
+  fbksendbk: /root/WRB_Gateway/SendBK/
+  fbktowrb: /home/partner/INFO01/to_org
+  fbkfromwrb: /home/partner/INFO01/from_org
   file:
     type: .dat
     header_snd: fbk_snd
@@ -18,7 +21,7 @@ path:
 bank:
   code: 970457
 oranization:
-  code: U000000001
+  code: 000000098
 
 
 rv001:
@@ -53,9 +56,11 @@ rv001:
 
 rv002:
   length:
+    s_coNo: 9
+    s_aplDscd: 5
+    s_filler: 435
     coNo: 9
     aplDscd: 5
-    msgDscd: 1
     outActNo: 25
     virActNo: 25
     virAcNm: 200
@@ -69,6 +74,10 @@ rv002:
     trnAvlyn: 1
     corpRecCompCode: 9
     filler: 46
+    e_totCnt: 7
+    e_totReqCnt: 7
+    e_totReqAmt: 23
+    e_filler: 412
 
 ht002:
   length:

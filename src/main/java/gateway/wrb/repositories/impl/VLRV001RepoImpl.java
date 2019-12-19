@@ -2,6 +2,7 @@ package gateway.wrb.repositories.impl;
 
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.VLR001Info;
+import gateway.wrb.domain.VLR001SInfo;
 import gateway.wrb.model.RV001DTO;
 import gateway.wrb.repositories.VLR001Repo;
 import gateway.wrb.util.Validator;
@@ -23,19 +24,23 @@ public class VLRV001RepoImpl implements VLR001Repo {
     @PersistenceContext
     private EntityManager entityManager;
 
-
     @Override
     public void addVLR001(VLR001Info vlr001Info) {
         entityManager.persist(vlr001Info);
     }
 
     @Override
+    public void addVLR001S(VLR001SInfo vlr001SInfo) {
+        entityManager.persist(vlr001SInfo);
+    }
+
+    @Override
     public List<RV001DTO> filterVLRV001(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt) {
         List<RV001DTO> vlr001InfoList = new ArrayList<>();
 
-        StringBuilder hql = new StringBuilder("FROM VLR001Info AS vlr001 INNER JOIN FbkFilesInfo AS fbkFiles " +
-                " ON vlr001.fbkname = fbkFiles.fbkname WHERE fbkFiles.conos = :bankCoNo  AND vlr001.virActNo = :outActNo");
-        System.out.println(hql);
+        StringBuilder hql = new StringBuilder("FROM VLR001Info AS vlr001 INNER JOIN FbkFilesInfo AS fbkFiles ON vlr001.fbkname = fbkFiles.fbkname " +
+                "INNER JOIN VLR001SInfo AS vlr001s ON vlr001s.fbkname = fbkFiles.fbkname " +
+                "WHERE fbkFiles.conos = :bankCoNo  AND vlr001s.outActNo = :outActNo");
         try {
             Map<String, String> mapParam = new LinkedHashMap<>();
             mapParam.put("bankCoNo", bankCoNo);
@@ -49,6 +54,7 @@ public class VLRV001RepoImpl implements VLR001Repo {
                 hql.append(" AND STR_TO_DATE (fbkFiles.trndt, '%Y%m%d') <= STR_TO_DATE (:bankRsvEdt, '%Y%m%d')");
             }
             Query query = entityManager.createQuery(hql.toString());
+            System.out.println(hql.toString());
             for (Map.Entry<String, String> entry : mapParam.entrySet()) {
                 query.setParameter(entry.getKey(), entry.getValue());
             }
@@ -137,6 +143,7 @@ public class VLRV001RepoImpl implements VLR001Repo {
             count = rs.get(0);
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
         return count > 0 ? true : false;
     }

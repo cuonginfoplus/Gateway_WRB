@@ -1,17 +1,20 @@
 package gateway.wrb.services.impl;
 
+import com.google.common.base.Strings;
 import gateway.wrb.cache.SeqCache;
 import gateway.wrb.config.BankConfig;
+import gateway.wrb.config.FbkConfig;
 import gateway.wrb.config.RA001Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.RA001Info;
+import gateway.wrb.domain.RA001SInfo;
+import gateway.wrb.model.RA001AccModel;
 import gateway.wrb.model.RA001DTO;
 import gateway.wrb.model.RA001Model;
 import gateway.wrb.model.SeqModel;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.RA001Repo;
-import gateway.wrb.repositories.SysFileSeqRepo;
 import gateway.wrb.services.RA001Service;
 import gateway.wrb.util.*;
 import org.slf4j.Logger;
@@ -39,6 +42,9 @@ public class RA001ServiceImpl implements RA001Service {
     BankConfig bankConfig;
 
     @Autowired
+    FbkConfig fbkConfig;
+
+    @Autowired
     RA001Config ra001Config;
 
     @Autowired
@@ -46,9 +52,6 @@ public class RA001ServiceImpl implements RA001Service {
 
     @Autowired
     FbkFilesRepo fbkFilesRepo;
-
-    @Autowired
-    SysFileSeqRepo sysFileSeqRepo;
 
     @Autowired
     SeqCache seqCache;
@@ -60,14 +63,14 @@ public class RA001ServiceImpl implements RA001Service {
     }
 
     @Override
-    public List<RA001DTO> getRA001(String orgCd, String bankCd, String bankCoNo, String bankRsvSdt, String bankRsvEdt) {
+    public List<RA001DTO> getRA001(String orgCd, String bankCd, String bankCoNo, String outActNo, String bankRsvSdt, String bankRsvEdt) {
         String bankCode = bankConfig.getBankCode();
         String orgCode = bankConfig.getOrgCode();
         List<RA001DTO> ra001DTOS = new ArrayList<>();
-        if (!bankCode.equals(bankCd) || !orgCode.equals(orgCd)) {
+        if (!bankCode.equals(bankCd)) {
             return ra001DTOS;
         } else {
-            ra001DTOS = ra001Repo.filterRA001(orgCd, bankCd, bankCoNo, bankRsvSdt, bankRsvEdt);
+            ra001DTOS = ra001Repo.filterRA001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
         }
 
         return ra001DTOS;
@@ -113,16 +116,28 @@ public class RA001ServiceImpl implements RA001Service {
                         line = line.substring(tmsTmLength);
                         String coNo = line.substring(0, coNoLength);
                         line = line.substring(coNoLength);
-                        //String outActNo = line.substring(0, outActNoLength);
+                        String outActNo = line.substring(0, actNoLength);
                         line = line.substring(actNoLength);
-                        //String dataCnt = line.substring(0, dataCntLength);
+                        String dataCnt = line.substring(0, dataCntLength);
                         line = line.substring(dataCntLength);
-                        //String etcAr = line.substring(0, etcArLength);
+                        String etcAr = line.substring(0, etcArLength);
                         line = line.substring(etcArLength);
 
                         fbkFilesInfo.setTmsdts(tmsDt);
                         fbkFilesInfo.setTmstms(tmsTm);
                         fbkFilesInfo.setConos(coNo);
+
+                        RA001SInfo ra001SInfo = new RA001SInfo();
+                        ra001SInfo.setMsgDscd("S");
+                        ra001SInfo.setTmsDt(tmsDt);
+                        ra001SInfo.setTmsTm(tmsDt);
+                        ra001SInfo.setCoNo(coNo);
+                        ra001SInfo.setOutActNo(outActNo);
+                        ra001SInfo.setDataCnt(dataCnt);
+                        ra001SInfo.setEtcAr(etcAr);
+                        ra001SInfo.setFbkname(fbkFilesInfo.getFbkname());
+
+                        ra001Repo.save_header(ra001SInfo);
 
                     } else if (line.startsWith(FileType.PREFIX_CONTENT)) {
                         String msgDscD = line.substring(0, msgDscdLength);
@@ -197,6 +212,9 @@ public class RA001ServiceImpl implements RA001Service {
                         if (!isRA001exist(info)) {
                             ra001Repo.save(info); //save a RA001Info to DB
                             System.out.println("Saved a RA001info to DB");
+                        } else {
+                            ra001Repo.update(info);
+                            System.out.println("Update RA001Info to DB");
                         }
                     }
                 } catch (Exception e) {
@@ -209,8 +227,6 @@ public class RA001ServiceImpl implements RA001Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
     @Override
@@ -230,7 +246,7 @@ public class RA001ServiceImpl implements RA001Service {
         try {
             Integer countEntity = ra001Repo.isRA001Exist(info.getMsgdscd(), info.getWdrActNo()
                     , info.getAplDscd(), info.getTrnStDt()
-                    , info.getTrnType(), info.getCurCd()
+                    , info.getTrnType(), info.getStatus(), info.getCurCd()
                     , info.getCusIdNo());
             logger.info("VLR001 " + info.getMsgdscd() + "," + info.getWdrActNo() + " detail has count = " + countEntity);
 
@@ -246,22 +262,66 @@ public class RA001ServiceImpl implements RA001Service {
 
     @Override
     public void createRA001Req(String dir, RA001Model model) {
+        FileUtils utils = new FileUtils();
+        //Request: fbk_awa_099_yyyyMMdd(8 length)_FirmbankingCustomerCode(9 length)_sequenceNumber(3 length).dat(Customer -> WooriBank)
+        //ex: fbk_awa_099_20190822_000000098_001.dat
+        String sndFileName = createSndFileName(AppConst.TYPE_RA001_REQ, model.getBankCoNo());
+        String path = dir + sndFileName;
         //parse model to string
         Charset utf8 = StandardCharsets.UTF_8;
         List<String> contents = new ArrayList<String>();
 
         contents.add(createStartContent(model));
-        contents.add(getDataContent(model));
+        List<RA001AccModel> ra001AccModels = model.getActList();
+        ra001AccModels.forEach(accModel -> {
+            boolean isSave = saveRA001(sndFileName, "D", accModel.getWdrActNo(), "RA001", accModel.getMsgTrno(), accModel.getTrnStDt(),
+                    accModel.getTrnClsDt(), accModel.getTrnType(), "REG01", accModel.getCurCd(), accModel.getRcpAm(),
+                    accModel.getRcpCnt(), accModel.getOutParticular(), accModel.getInParticular(),
+                    accModel.getCus_id_no_cd(), accModel.getCus_id_no(), accModel.getIsuDt(), accModel.getVld_edt());
+            if (isSave) {
+                contents.add(getDataContent(accModel));
+            }
+        });
+        if (contents.size() > 1) {
+            utils.createFile(path, contents);
 
-        FileUtils utils = new FileUtils();
-        //Request: fbk_awa_099_yyyyMMdd(8 length)_FirmbankingCustomerCode(9 length)_sequenceNumber(3 length).dat(Customer -> WooriBank)
-        //ex: fbk_awa_099_20190822_000000098_001.dat
-        String sndFileName = createSndFileName(AppConst.TYPE_RA001_REQ, model.getOrgCd());
-        String path = dir + sndFileName;
-        utils.createFile(path, contents);
-
+        }
     }
 
+    private boolean saveRA001(String fbkName, String msgDscD, String wdrActNo, String aplDscd, String msgTrno, String trnStDt,
+                              String trnClsDt, String trnType, String status, String curCd, String rcpAm, String rcpCnt, String outParticular, String inParticular,
+                              String cusIdNoCd, String cusIdNo, String isuDt, String vldEdt
+    ) {
+        try {
+            RA001Info info = new RA001Info();
+            info.setFbkname(fbkName);
+            info.setMsgdscd(msgDscD);
+            info.setWdrActNo(wdrActNo);
+            info.setAplDscd(aplDscd);
+            info.setMsgTrno(msgTrno);
+            info.setTrnStDt(trnStDt);
+            info.setTrnClsDt(trnClsDt);
+            info.setTrnType(trnType);
+            info.setStatus(status);
+            info.setCurCd(curCd);
+            info.setRcpAm(rcpAm);
+            info.setRcpCnt(rcpCnt);
+            info.setOutParticular(outParticular);
+            info.setInParticular(inParticular);
+            info.setCusIdNoCd(cusIdNoCd);
+            info.setCusIdNo(cusIdNo);
+            info.setIsuDt(isuDt);
+            info.setVldEdt(vldEdt);
+            if (!isRA001exist(info)) {
+                System.out.println("Saved a RA001info to DB");
+                ra001Repo.save(info); //save a RA001Info to DB
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     private String createStartContent(RA001Model model) {
         Integer tmsDtLength = ra001Config.getTmsDtLength();
@@ -277,17 +337,17 @@ public class RA001ServiceImpl implements RA001Service {
 
         StringBuilder builder = new StringBuilder();
         builder.append("S");
-        builder.append(StringUtils.padLeftSpaces(strCurrDate, tmsDtLength));
-        builder.append(StringUtils.padLeftSpaces(strCurrHour, tmsTmLength));
-        builder.append(StringUtils.padLeftSpaces(model.getOrgCd(), coNoLength));
-        builder.append(StringUtils.padLeftSpaces(model.getWdrActNo(), actNoLength));
-        builder.append(StringUtils.padLeftSpaces("1", dataCntLength));
-        builder.append(StringUtils.padLeftSpaces("0", etcArLength));
+        builder.append(Strings.padStart(strCurrDate, tmsDtLength, '0'));
+        builder.append(Strings.padStart(strCurrHour, tmsTmLength, '0'));
+        builder.append(Strings.padEnd(model.getBankCoNo(), coNoLength, ' '));
+        builder.append(Strings.padEnd(model.getOutActNo(), actNoLength, ' '));
+        builder.append(Strings.padStart("1", dataCntLength, '0'));
+        builder.append(Strings.padStart("0", etcArLength, ' '));
 
         return builder.toString();
     }
 
-    private String getDataContent(RA001Model model) {
+    private String getDataContent(RA001AccModel model) {
         Integer wdrActNoLength = ra001Config.getWdrActNoLength();
         Integer aplDscdLength = ra001Config.getAplDscdLength();
         Integer msgTrnoLength = ra001Config.getMsgTrnoLength();
@@ -308,22 +368,22 @@ public class RA001ServiceImpl implements RA001Service {
         StringBuilder builder = new StringBuilder();
         builder.append("D");
 
-        builder.append(StringUtils.padLeftSpaces(model.getWdrActNo(), wdrActNoLength));
-        builder.append(StringUtils.padLeftSpaces("RA001", aplDscdLength));
-        builder.append(StringUtils.padLeftSpaces(model.getMsgTrno(), msgTrnoLength));
-        builder.append(StringUtils.padLeftSpaces(model.getTrnStDt(), trnStDtLength));
-        builder.append(StringUtils.padLeftSpaces(model.getTrnClsDt(), trnClsDtLength));
-        builder.append(StringUtils.padLeftSpaces(model.getTrnType(), trnTypeLength));
-        builder.append(StringUtils.padLeftSpaces("", statusLength));
-        builder.append(StringUtils.padLeftSpaces(model.getCurCd(), curCdLength));
-        builder.append(StringUtils.padLeftSpaces(model.getRcpAm(), rcpAmLength));
-        builder.append(StringUtils.padLeftSpaces(model.getRcpCnt(), rcpCntLength));
-        builder.append(StringUtils.padLeftSpaces(model.getOutParticular(), outParticularLength));
-        builder.append(StringUtils.padLeftSpaces(model.getInParticular(), inParticularLength));
-        builder.append(StringUtils.padLeftSpaces(model.getCus_id_no_cd(), cusIdNoCdLength));
-        builder.append(StringUtils.padLeftSpaces(model.getCus_id_no(), cusIdNoLength));
-        builder.append(StringUtils.padLeftSpaces(model.getIsuDt(), isuDtLength));
-        builder.append(StringUtils.padLeftSpaces(model.getVld_edt(), vldEdtLength));
+        builder.append(Strings.padEnd(model.getWdrActNo(), wdrActNoLength, ' '));
+        builder.append(Strings.padEnd("RA001", aplDscdLength, ' '));
+        builder.append(Strings.padEnd(model.getMsgTrno(), msgTrnoLength, ' '));
+        builder.append(Strings.padEnd(model.getTrnStDt(), trnStDtLength, ' '));
+        builder.append(Strings.padEnd(model.getTrnClsDt(), trnClsDtLength, ' '));
+        builder.append(Strings.padEnd(model.getTrnType(), trnTypeLength, ' '));
+        builder.append(Strings.padEnd("", statusLength, ' '));
+        builder.append(Strings.padEnd(model.getCurCd(), curCdLength, ' '));
+        builder.append(Strings.padStart(model.getRcpAm() + "000", rcpAmLength, '0'));
+        builder.append(Strings.padEnd(model.getRcpCnt(), rcpCntLength, ' '));
+        builder.append(Strings.padEnd(model.getOutParticular(), outParticularLength, ' '));
+        builder.append(Strings.padEnd(model.getInParticular(), inParticularLength, ' '));
+        builder.append(Strings.padEnd(model.getCus_id_no_cd(), cusIdNoCdLength, ' '));
+        builder.append(Strings.padEnd(model.getCus_id_no(), cusIdNoLength, ' '));
+        builder.append(Strings.padEnd(model.getIsuDt(), isuDtLength, ' '));
+        builder.append(Strings.padEnd(model.getVld_edt(), vldEdtLength, ' '));
         return builder.toString();
     }
 

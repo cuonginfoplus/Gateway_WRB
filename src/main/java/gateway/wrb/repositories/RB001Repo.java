@@ -15,8 +15,7 @@ public interface RB001Repo {
     void save_header(RB001SInfo info);
 
     Integer isRB001Exist(String msgdscd, String seq, String outActNo, String curCd, String trnAm, String tobkDscd, String istDscd, String inCdAccGb, String rcvbk1Cd,
-                         String rcvbk2Cd, String rcvbkNm, String sndName, String rcvacDppeNm, String depRmk, String wdrRmk, String trnSrno, String status,
-                         String prcCd, String errCd, String refNo, String filler);
+                         String rcvbk2Cd, String status, String refNo);
 
     List<RB001SDTO> filterRB001S(String orgCd, String bankCd, String bankCoNo, String trnxId);
 }

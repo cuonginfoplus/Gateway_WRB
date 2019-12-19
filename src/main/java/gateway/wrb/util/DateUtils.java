@@ -160,4 +160,11 @@ public class DateUtils {
         SimpleDateFormat formatter = new SimpleDateFormat(format);
         return formatter.format(date);
     }
+
+    public static String nextDate(int next) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.DATE, next);
+        return sdf.format(c.getTime());
+    }
 }

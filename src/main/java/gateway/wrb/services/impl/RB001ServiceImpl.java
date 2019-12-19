@@ -1,22 +1,19 @@
 package gateway.wrb.services.impl;
 
+import com.google.common.base.Strings;
+import gateway.wrb.cache.SeqCache;
 import gateway.wrb.config.BankConfig;
+import gateway.wrb.config.FbkConfig;
 import gateway.wrb.config.RB001Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.domain.RB001Info;
 import gateway.wrb.domain.RB001SInfo;
-import gateway.wrb.model.RB001DTO;
-import gateway.wrb.model.RB001Model;
-import gateway.wrb.model.RB001SDTO;
+import gateway.wrb.model.*;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.repositories.RB001Repo;
-import gateway.wrb.repositories.SysFileSeqRepo;
 import gateway.wrb.services.RB001Service;
-import gateway.wrb.util.AppConst;
-import gateway.wrb.util.DateUtils;
-import gateway.wrb.util.FileUtils;
-import gateway.wrb.util.StringUtils;
+import gateway.wrb.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +34,9 @@ public class RB001ServiceImpl implements RB001Service {
     public static final Logger logger = LoggerFactory.getLogger(RB001ServiceImpl.class);
 
     @Autowired
+    FbkConfig fbkConfig;
+
+    @Autowired
     BankConfig bankConfig;
 
     @Autowired
@@ -49,15 +49,14 @@ public class RB001ServiceImpl implements RB001Service {
     FbkFilesRepo fbkFilesRepo;
 
     @Autowired
-    SysFileSeqRepo sysFileSeqRepo;
+    SeqCache seqCache;
 
 
     @Override
     public List<RB001DTO> getRB001(String orgCd, String bankCd, String bankCoNo, String trnxId) {
         String bankCode = bankConfig.getBankCode();
-        String orgCode = bankConfig.getOrgCode();
         List<RB001DTO> rb001DTOS = new ArrayList<>();
-        if (!bankCode.equals(bankCd) || !orgCode.equals(orgCd)) {
+        if (!bankCode.equals(bankCd)) {
             return rb001DTOS;
         } else {
             rb001DTOS = rb001Repo.filterRB001(orgCd, bankCd, bankCoNo, trnxId);
@@ -278,13 +277,7 @@ public class RB001ServiceImpl implements RB001Service {
                     , info.getOutActNo(), info.getCurCd()
                     , info.getTrnAm(), info.getTobkDscd()
                     , info.getIstDscd(), info.getInCdAccGb()
-                    , info.getRcvbk1Cd(), info.getRcvbk2Cd()
-                    , info.getRcvbkNm(), info.getSndName()
-                    , info.getRcvacDppeNm(), info.getDepRmk()
-                    , info.getWdrRmk(), info.getTrnSrno()
-                    , info.getStatus(), info.getPrcCd()
-                    , info.getErrCd(), info.getRefNo()
-                    , info.getFiller());
+                    , info.getRcvbk1Cd(), info.getRcvbk2Cd(), info.getStatus(), info.getRefNo());
             logger.info("RB001 " + info.getMsgDscd() + "," + info.getSeq() + " detail has count = " + countEntity);
 
             if (countEntity < 1)
@@ -297,24 +290,76 @@ public class RB001ServiceImpl implements RB001Service {
         return true;
     }
 
+    public boolean saveRB001(String fbkname, String msgDscD, String seq, String outActNo, String curCd, String trnAm, String tobkDscd
+            , String istDscd, String inCdAccGb, String rcvbk1Cd, String rcvbk2Cd, String rcvbkNm, String sndName, String rcvacDppeNm, String depRmk
+            , String wdrRmk, String trnSrno, String status, String prcCd, String errCd, String refNo, String filler) {
+        try {
+            // save to DB
+            RB001Info info = new RB001Info();
+            info.setFbkname(fbkname);
+            info.setMsgDscd(msgDscD);
+            info.setSeq(seq);
+            info.setOutActNo(outActNo);
+            info.setCurCd(curCd);
+            info.setTrnAm(trnAm);
+            info.setTobkDscd(tobkDscd);
+            info.setIstDscd(istDscd);
+            info.setInCdAccGb(inCdAccGb);
+            info.setRcvbk1Cd(rcvbk1Cd);
+            info.setRcvbk2Cd(rcvbk2Cd);
+            info.setRcvbkNm(rcvbkNm);
+            info.setSndName(sndName);
+            info.setRcvacDppeNm(rcvacDppeNm);
+            info.setDepRmk(depRmk);
+            info.setWdrRmk(wdrRmk);
+            info.setTrnSrno(trnSrno);
+            info.setStatus(status);
+            info.setPrcCd(prcCd);
+            info.setErrCd(errCd);
+            info.setRefNo(refNo);
+            info.setFiller(filler);
+
+            if (!isRB001exist(info)) {
+                rb001Repo.save(info);
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     @Override
     public void createRB001Req(String dir, RB001Model model) {
+        int totReqCnt = 0;
+        int totReqAmt = 0;
+        FileUtils utils = new FileUtils();
+        //Request: fbk_ccr_099_yyyyMMdd(8 length)_FirmbankingCustomerCode(9 length)_sequenceNumber(3 length).dat(Customer->WooriBank)
+        //ex: fbk_ccr_099_20190820_000000098_001.dat
+        String sndFileName = createSndFileName(AppConst.TYPE_RA001_REQ, model.getBankCoNo());
+        String path = dir + sndFileName;
         //parse model to string
         Charset utf8 = StandardCharsets.UTF_8;
         List<String> contents = new ArrayList<String>();
 
         contents.add(buildStartContent(model));
-        contents.add(buildDataContent(model));
-        contents.add(buildEndContent(model));
+        List<RB001AccModel> rb001AccModels = model.getTrnList();
+        for (int i = 0; i < rb001AccModels.size(); i++) {
+            boolean isSave = saveRB001(sndFileName, "D", rb001AccModels.get(i).getSeq(), rb001AccModels.get(i).getOutActNo(), rb001AccModels.get(i).getCurCd(), rb001AccModels.get(i).getTrnAm(),
+                    rb001AccModels.get(i).getTobkDscd(), rb001AccModels.get(i).getIstDscd(), rb001AccModels.get(i).getInCdAccGb(), rb001AccModels.get(i).getRcvbk1Cd(), rb001AccModels.get(i).getRcvbk2Cd(),
+                    rb001AccModels.get(i).getRcvbkNm(), rb001AccModels.get(i).getSndName(), rb001AccModels.get(i).getRcvacDppeNm(),
+                    rb001AccModels.get(i).getDepRmk(), rb001AccModels.get(i).getWdrRmk(), "", rb001AccModels.get(i).getStatus(), "", "", rb001AccModels.get(i).getRefNo(), "");
+            if (isSave) {
+                contents.add(buildDataContent(rb001AccModels.get(i)));
+                totReqCnt++;
+                totReqAmt = totReqAmt + Integer.parseInt(rb001AccModels.get(i).getTrnAm());
+            }
+        }
 
-        FileUtils utils = new FileUtils();
-        //Request: fbk_ccr_099_yyyyMMdd(8 length)_FirmbankingCustomerCode(9 length)_sequenceNumber(3 length).dat(Customer->WooriBank)
-        //ex: fbk_ccr_099_20190820_000000098_001.dat
-        String sndFileName = createSndFileName(AppConst.TYPE_RA001_REQ, model.getOrgCd());
-        String path = dir + sndFileName;
-        utils.createFile(path, contents);
-
+        if (contents.size() > 1) {
+            contents.add(buildEndContent(model, totReqCnt, totReqAmt));
+            utils.createFile(path, contents);
+        }
     }
 
     @Override
@@ -331,7 +376,6 @@ public class RB001ServiceImpl implements RB001Service {
     }
 
     private String buildStartContent(RB001Model model) {
-        Integer S_msgDscd_1Length = rb001Config.getS_msgDscd_1();
         Integer S_coNoLength = rb001Config.getS_coNo();
         Integer S_reqDtLength = rb001Config.getS_reqDt();
         Integer S_trnDtLength = rb001Config.getS_trnDt();
@@ -349,24 +393,26 @@ public class RB001ServiceImpl implements RB001Service {
 
         StringBuilder builder = new StringBuilder();
         builder.append("S");
-        builder.append(StringUtils.padLeftSpaces(model.getOrgCd(), S_coNoLength));
-        builder.append(StringUtils.padLeftSpaces(model.getReqDt(), S_reqDtLength));
-        builder.append(StringUtils.padLeftSpaces(model.getTrnDt(), S_trnDtLength));
-        builder.append(StringUtils.padLeftSpaces(model.getInActNo(), S_inActNoLength));
-        builder.append(StringUtils.padLeftSpaces(model.getTrnDscd(), S_trnDscdLength));
-        builder.append(StringUtils.padLeftSpaces(model.getMsgDscd(), S_msgDscd_2Length));
-        builder.append(StringUtils.padLeftSpaces(model.getRqDscd(), S_rqDscdLength));
-        builder.append(StringUtils.padLeftSpaces(model.getMultiTrnCd(), S_multiTrnCd));
-        builder.append(StringUtils.padLeftSpaces(model.getFeePreOcc(), S_feePreOcc));
-        builder.append(StringUtils.padLeftSpaces(model.getFeeInclYn(), S_feeInclYn));
-        builder.append(StringUtils.padLeftSpaces("0", S_firmSvrSec));
-        builder.append(StringUtils.padLeftSpaces("0", S_firmSvrSec2));
-        builder.append(StringUtils.padLeftSpaces("0", S_confirmDupYn));
-        builder.append(StringUtils.padLeftSpaces("0", S_filler));
+        builder.append(Strings.padEnd(model.getBankCoNo(), S_coNoLength, ' '));
+        // Request Date : D+1
+        builder.append(Strings.padStart(DateUtils.nextDate(0), S_reqDtLength, '0'));
+        // Transaction Date : D+2
+        builder.append(Strings.padStart(DateUtils.nextDate(2), S_trnDtLength, '0'));
+        builder.append(Strings.padEnd(model.getInActNo(), S_inActNoLength, ' '));
+        builder.append(Strings.padEnd(model.getTrnDscd(), S_trnDscdLength, ' '));
+        builder.append(Strings.padEnd("RB001", S_msgDscd_2Length, ' '));
+        builder.append(Strings.padEnd(model.getRqDscd(), S_rqDscdLength, ' '));
+        builder.append(Strings.padEnd(model.getMultiTrnCd(), S_multiTrnCd, ' '));
+        builder.append(Strings.padEnd(model.getFeePreOcc(), S_feePreOcc, ' '));
+        builder.append(Strings.padEnd(model.getFeeInclYn(), S_feeInclYn, ' '));
+        builder.append(Strings.padEnd("0", S_firmSvrSec, ' '));
+        builder.append(Strings.padEnd("0", S_firmSvrSec2, ' '));
+        builder.append(Strings.padStart("0", S_confirmDupYn, ' '));
+        builder.append(Strings.padEnd("0", S_filler, ' '));
         return builder.toString();
     }
 
-    private String buildDataContent(RB001Model model) {
+    private String buildDataContent(RB001AccModel model) {
         Integer D_msgDscdLength = rb001Config.getMsgDscd();
         Integer D_seqLength = rb001Config.getSeq();
         Integer D_outActNoLength = rb001Config.getOutActNo();
@@ -391,30 +437,46 @@ public class RB001ServiceImpl implements RB001Service {
 
         StringBuilder builder = new StringBuilder();
         builder.append("D");
-        builder.append(StringUtils.padLeftSpaces(model.getSeq(), D_seqLength));
-        builder.append(StringUtils.padLeftSpaces(model.getOutActNo(), D_outActNoLength));
-        builder.append(StringUtils.padLeftSpaces(model.getCurCd(), D_curCdLength));
-        builder.append(StringUtils.padLeftSpaces(model.getTrnAm(), D_trnAmLength));
-        builder.append(StringUtils.padLeftSpaces(model.getTobkDscd(), D_tobkDscd));
-        builder.append(StringUtils.padLeftSpaces(model.getIstDscd(), D_istDscdLength));
-        builder.append(StringUtils.padLeftSpaces(model.getInCdAccGb(), D_inCdAccGbLength));
-        builder.append(StringUtils.padLeftSpaces(model.getRcvbk1Cd(), D_rcvbk1CdLength));
-        builder.append(StringUtils.padLeftSpaces(model.getRcvbk2Cd(), D_rcvbk2CdLength));
-        builder.append(StringUtils.padLeftSpaces(model.getRcvbkNm(), D_rcvbkNmLength));
-        builder.append(StringUtils.padLeftSpaces(model.getSndName(), D_sndNameLength));
-        builder.append(StringUtils.padLeftSpaces(model.getRcvacDppeNm(), D_rcvacDppeNmLength));
-        builder.append(StringUtils.padLeftSpaces(model.getDepRmk(), D_depRmkLength));
-        builder.append(StringUtils.padLeftSpaces(model.getWdrRmk(), D_wdrRmkLength));
-        builder.append(StringUtils.padLeftSpaces(model.getTrnSrno(), D_trnSrnoLength));
-        builder.append(StringUtils.padLeftSpaces(model.getStatus(), D_statusLength));
-        builder.append(StringUtils.padLeftSpaces(model.getPrcCd(), D_prcCdLength));
-        builder.append(StringUtils.padLeftSpaces(model.getErrCd(), D_errCdLength));
-        builder.append(StringUtils.padLeftSpaces(model.getRefNo(), D_refNoLength));
+
+        // Gen Seq
+        String seq = "1";
+        SeqModel seqModel = seqCache.getItem("rb001seq");
+        if (Validator.validate(seqModel)) {
+            Integer nextVal = seqModel.getSeqValue();
+            nextVal++;
+            seqCache.updateItem(new SeqModel("rb001seq", nextVal));
+        } else {
+            seqCache.addItem(new SeqModel("rb001seq", 1));
+        }
+        SeqModel nextSeq = seqCache.getItem("rb001seq");
+        if (Validator.validate(nextSeq)) {
+            seq = Strings.padStart(String.valueOf(nextSeq.getSeqValue()), 10, '0');
+        }
+
+        builder.append(seq);
+        builder.append(Strings.padEnd(model.getOutActNo(), D_outActNoLength, ' '));
+        builder.append(Strings.padEnd(model.getCurCd(), D_curCdLength, ' '));
+        builder.append(Strings.padStart(model.getTrnAm(), D_trnAmLength, '0'));
+        builder.append(Strings.padEnd(model.getTobkDscd(), D_tobkDscd, ' '));
+        builder.append(Strings.padEnd(model.getIstDscd(), D_istDscdLength, ' '));
+        builder.append(Strings.padEnd(model.getInCdAccGb(), D_inCdAccGbLength, ' '));
+        builder.append(Strings.padEnd(model.getRcvbk1Cd(), D_rcvbk1CdLength, ' '));
+        builder.append(Strings.padEnd(model.getRcvbk2Cd(), D_rcvbk2CdLength, ' '));
+        builder.append(Strings.padEnd(model.getRcvbkNm(), D_rcvbkNmLength, ' '));
+        builder.append(Strings.padEnd(model.getSndName(), D_sndNameLength, ' '));
+        builder.append(Strings.padEnd(model.getRcvacDppeNm(), D_rcvacDppeNmLength, ' '));
+        builder.append(Strings.padEnd(model.getDepRmk(), D_depRmkLength, ' '));
+        builder.append(Strings.padEnd(model.getWdrRmk(), D_wdrRmkLength, ' '));
+        builder.append(Strings.padEnd("", D_trnSrnoLength, ' '));
+        builder.append(Strings.padEnd("REG01", D_statusLength, ' '));
+        builder.append(Strings.padEnd("00", D_prcCdLength, ' '));
+        builder.append(Strings.padEnd("", D_errCdLength, ' '));
+        builder.append(Strings.padEnd(model.getRefNo(), D_refNoLength, ' '));
+        builder.append(Strings.padEnd("", D_fillerLength, ' '));
         return builder.toString();
     }
 
-    private String buildEndContent(RB001Model model) {
-        Integer E_msgDscd = rb001Config.getE_msgDscd();
+    private String buildEndContent(RB001Model model, int totReqCnt, int totReqAmt) {
         Integer E_totCnt = rb001Config.getE_totCnt();
         Integer E_totReqCnt = rb001Config.getE_totReqCnt();
         Integer E_totReqAmt = rb001Config.getE_totReqAmt();
@@ -430,30 +492,37 @@ public class RB001ServiceImpl implements RB001Service {
 
         StringBuilder builder = new StringBuilder();
         builder.append("E");
-        builder.append(StringUtils.padLeftSpaces("0", E_totCnt));
-        builder.append(StringUtils.padLeftSpaces("0", E_totReqCnt));
-        builder.append(StringUtils.padLeftSpaces("0", E_totReqAmt));
-        builder.append(StringUtils.padLeftSpaces("0", E_totSucCnt));
-        builder.append(StringUtils.padLeftSpaces("0", E_totSucAmt));
-        builder.append(StringUtils.padLeftSpaces("0", E_failCnt));
-        builder.append(StringUtils.padLeftSpaces("0", E_failAmt));
-        builder.append(StringUtils.padLeftSpaces("0", E_inSucCnt));
-        builder.append(StringUtils.padLeftSpaces("0", E_inSucAmt));
-        builder.append(StringUtils.padLeftSpaces("0", E_outSucCnt));
-        builder.append(StringUtils.padLeftSpaces("0", E_outSucCnt));
-        builder.append(StringUtils.padLeftSpaces("0", E_outSucAmt));
-        builder.append(StringUtils.padLeftSpaces("0", E_filler));
+        builder.append(Strings.padStart(String.valueOf(totReqCnt + 2), E_totCnt, '0'));
+        builder.append(Strings.padStart(String.valueOf(totReqCnt), E_totReqCnt, '0'));
+        builder.append(Strings.padStart(String.valueOf(totReqAmt), E_totReqAmt, '0'));
+        builder.append(Strings.padStart("0", E_totSucCnt, '0'));
+        builder.append(Strings.padStart("0", E_totSucAmt, '0'));
+        builder.append(Strings.padStart("0", E_failCnt, '0'));
+        builder.append(Strings.padStart("0", E_failAmt, '0'));
+        builder.append(Strings.padStart("0", E_inSucCnt, '0'));
+        builder.append(Strings.padStart("0", E_inSucAmt, '0'));
+        builder.append(Strings.padStart("0", E_outSucCnt, '0'));
+        builder.append(Strings.padStart("0", E_outSucAmt, '0'));
+        builder.append(Strings.padEnd("0", E_filler, ' '));
         return builder.toString();
     }
 
     private String createSndFileName(String fileType, String customerCode) {
         String strCurrDate = DateUtils.getDateFormat(new Date(), "yyyyMMdd");
-        Integer curSeq = sysFileSeqRepo.getNextSeq(strCurrDate, fileType);
-        String seq = "001";
-        if (curSeq != null) {
-            seq = StringUtils.padLeftZeros(curSeq.toString(), 3);
-        }
+        String seq = "1";
+        SeqModel seqModel = seqCache.getItem("fbk_ccr_099_" + strCurrDate);
 
+        if (Validator.validate(seqModel)) {
+            Integer nextVal = seqModel.getSeqValue();
+            nextVal++;
+            seqCache.updateItem(new SeqModel("fbk_ccr_099_" + strCurrDate, nextVal));
+        } else {
+            seqCache.addItem(new SeqModel("fbk_ccr_099_" + strCurrDate, 1));
+        }
+        SeqModel nextSeq = seqCache.getItem("fbk_ccr_099_" + strCurrDate);
+        if (Validator.validate(nextSeq)) {
+            seq = StringUtils.padLeftZeros(String.valueOf(nextSeq.getSeqValue()), 3);
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("fbk_ccr_099_");
         sb.append(strCurrDate + "_");

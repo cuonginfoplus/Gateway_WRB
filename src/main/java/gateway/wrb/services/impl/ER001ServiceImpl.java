@@ -48,7 +48,7 @@ public class ER001ServiceImpl implements ER001Service {
         String bankCode = bankConfig.getBankCode();
         String orgCode = bankConfig.getOrgCode();
         List<ER001Info> er001Infos = new ArrayList<>();
-        if (!bankCode.equals(bankCd) || !orgCode.equals(orgCd)) {
+        if (!bankCode.equals(bankCd)) {
             return er001Infos;
         } else {
             er001Infos = er001Repo.filterER001(orgCd, bankCd, bankCoNo, noticeSdt, noticeEdt);

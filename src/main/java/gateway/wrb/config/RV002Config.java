@@ -6,13 +6,13 @@ import org.springframework.beans.factory.annotation.Value;
 @org.springframework.context.annotation.Configuration
 @Getter
 public class RV002Config {
-    @Value("${rv002.length.coNo}")
+    @Value("${rv002.length.s_coNo}")
     private Integer coNoLength;
-    @Value("${rv002.length.aplDscd}")
+    @Value("${rv002.length.s_aplDscd}")
     private Integer aplDscdLength;
+    @Value("${rv002.length.s_filler}")
+    private Integer Sfiller;
 
-    @Value("${rv002.length.msgDscd}")
-    private Integer msgDscdLength;
     @Value("${rv002.length.outActNo}")
     private Integer outActNoLength;
     @Value("${rv002.length.virActNo}")
@@ -39,5 +39,14 @@ public class RV002Config {
     private Integer corpRecCompCodeLength;
     @Value("${rv002.length.filler}")
     private Integer fillerLength;
+
+    @Value("${rv002.length.e_totCnt}")
+    private Integer EtotCntLength;
+    @Value("${rv002.length.e_totReqCnt}")
+    private Integer EtotReqCntLength;
+    @Value("${rv002.length.e_totReqAmt}")
+    private Integer EtotReqAmtLength;
+    @Value("${rv002.length.e_filler}")
+    private Integer EfillerLength;
 
 }
