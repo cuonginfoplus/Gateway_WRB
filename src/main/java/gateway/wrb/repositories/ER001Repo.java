@@ -1,6 +1,7 @@
 package gateway.wrb.repositories;
 
 import gateway.wrb.domain.ER001Info;
+import gateway.wrb.model.ER001DTO;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -12,5 +13,5 @@ public interface ER001Repo {
             , BigDecimal baseRate, BigDecimal cashBuying, BigDecimal cashSelling, BigDecimal ttBuying
             , BigDecimal ttSelling, String orderDscd, String status, String filler);
 
-    List<ER001Info> filterER001(String orgCd, String bankCd, String bankCoNo, String noticeSdt, String noticeEdt);
+    List<ER001DTO> filterER001(String orgCd, String bankCd, String bankCoNo, String noticeSdt, String noticeEdt);
 }

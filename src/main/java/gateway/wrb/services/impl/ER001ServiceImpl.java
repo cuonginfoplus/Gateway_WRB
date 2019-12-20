@@ -5,6 +5,7 @@ import gateway.wrb.config.ER001Config;
 import gateway.wrb.constant.FileType;
 import gateway.wrb.domain.ER001Info;
 import gateway.wrb.domain.FbkFilesInfo;
+import gateway.wrb.model.ER001DTO;
 import gateway.wrb.repositories.ER001Repo;
 import gateway.wrb.repositories.FbkFilesRepo;
 import gateway.wrb.services.ER001Service;
@@ -44,10 +45,10 @@ public class ER001ServiceImpl implements ER001Service {
     }
 
     @Override
-    public List<ER001Info> getER001(String orgCd, String bankCd, String bankCoNo, String noticeSdt, String noticeEdt) {
+    public List<ER001DTO> getER001(String orgCd, String bankCd, String bankCoNo, String noticeSdt, String noticeEdt) {
         String bankCode = bankConfig.getBankCode();
         String orgCode = bankConfig.getOrgCode();
-        List<ER001Info> er001Infos = new ArrayList<>();
+        List<ER001DTO> er001Infos = new ArrayList<>();
         if (!bankCode.equals(bankCd)) {
             return er001Infos;
         } else {
@@ -153,7 +154,6 @@ public class ER001ServiceImpl implements ER001Service {
 
                         if (!isExisted(er001Info))
                             er001Repo.save(er001Info);
-
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

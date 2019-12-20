@@ -185,7 +185,7 @@ public class FbkController {
             @RequestParam("noticeEdt") String noticeEdt
     ) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
-        List<ER001Info> er001Infos = er001Service.getER001(orgCd, bankCd, bankCoNo, noticeSdt, noticeEdt);
+        List<ER001DTO> er001Infos = er001Service.getER001(orgCd, bankCd, bankCoNo, noticeSdt, noticeEdt);
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(er001Infos, HttpStatus.OK);
     }

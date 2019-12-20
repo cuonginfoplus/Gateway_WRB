@@ -1,6 +1,7 @@
 package gateway.wrb.repositories.impl;
 
 import gateway.wrb.domain.ER001Info;
+import gateway.wrb.model.ER001DTO;
 import gateway.wrb.repositories.ER001Repo;
 import gateway.wrb.util.Validator;
 import org.springframework.stereotype.Repository;
@@ -57,8 +58,8 @@ public class ER001RepoImpl implements ER001Repo {
     }
 
     @Override
-    public List<ER001Info> filterER001(String orgCd, String bankCd, String bankCoNo, String noticeSdt, String noticeEdt) {
-        List<ER001Info> er001Infos = new ArrayList<>();
+    public List<ER001DTO> filterER001(String orgCd, String bankCd, String bankCoNo, String noticeSdt, String noticeEdt) {
+        List<ER001DTO> er001DTOS = new ArrayList<>();
         try {
             StringBuilder hql = new StringBuilder("FROM ER001Info as er001 " +
                     "INNER JOIN FbkFilesInfo AS fbkFiles ON er001.fbkname = fbkFiles.fbkname ");
@@ -78,12 +79,28 @@ public class ER001RepoImpl implements ER001Repo {
             List<?> rs = query.getResultList();
             for (int i = 0; i < rs.size(); ++i) {
                 Object[] row = (Object[]) rs.get(i);
-                er001Infos.add((ER001Info) row[0]);
+                ER001DTO er001DTO = convertDTO((ER001Info) row[0]);
+                er001DTOS.add(er001DTO);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return er001Infos;
+        return er001DTOS;
+    }
+
+    private ER001DTO convertDTO(ER001Info er001Info) {
+        ER001DTO er001DTO = new ER001DTO();
+        er001DTO.setNoticeDt(er001Info.getNoticeDt());
+        er001DTO.setNoticeCnt(er001Info.getNoticeCnt());
+        er001DTO.setFromCcy(er001Info.getToCcy());
+        er001DTO.setBaseRate(er001Info.getBaseRate());
+        er001DTO.setCashBuying(er001Info.getCashBuying());
+        er001DTO.setCashSelling(er001Info.getCashSelling());
+        er001DTO.setTtBuying(er001Info.getTtBuying());
+        er001DTO.setTtSelling(er001Info.getTtSelling());
+        er001DTO.setOrderDscd(er001Info.getOrderDscd());
+        er001DTO.setStatus(er001Info.getStatus());
+        return er001DTO;
     }
 }
 
