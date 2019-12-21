@@ -93,11 +93,31 @@ public class ER001RepoImpl implements ER001Repo {
         er001DTO.setNoticeDt(er001Info.getNoticeDt());
         er001DTO.setNoticeCnt(er001Info.getNoticeCnt());
         er001DTO.setFromCcy(er001Info.getToCcy());
-        er001DTO.setBaseRate(er001Info.getBaseRate());
-        er001DTO.setCashBuying(er001Info.getCashBuying());
-        er001DTO.setCashSelling(er001Info.getCashSelling());
-        er001DTO.setTtBuying(er001Info.getTtBuying());
-        er001DTO.setTtSelling(er001Info.getTtSelling());
+        if (Validator.validate(er001Info.getBaseRate())) {
+            er001DTO.setBaseRate(er001Info.getBaseRate());
+        } else {
+            er001DTO.setBaseRate(new BigDecimal(0));
+        }
+        if (Validator.validate(er001Info.getCashBuying())) {
+            er001DTO.setCashBuying(er001Info.getCashBuying());
+        } else {
+            er001DTO.setCashBuying(new BigDecimal(0));
+        }
+        if (Validator.validate(er001Info.getCashSelling())) {
+            er001DTO.setCashSelling(er001Info.getCashSelling());
+        } else {
+            er001DTO.setCashSelling(new BigDecimal(0));
+        }
+        if (Validator.validate(er001Info.getTtBuying())) {
+            er001DTO.setTtBuying(er001Info.getTtBuying());
+        } else {
+            er001DTO.setTtBuying(new BigDecimal(0));
+        }
+        if (Validator.validate(er001Info.getTtSelling())) {
+            er001DTO.setTtSelling(er001Info.getTtSelling());
+        } else {
+            er001DTO.setTtSelling(new BigDecimal(0));
+        }
         er001DTO.setOrderDscd(er001Info.getOrderDscd());
         er001DTO.setStatus(er001Info.getStatus());
         return er001DTO;
