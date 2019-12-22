@@ -1,6 +1,7 @@
 package gateway.wrb.repositories.impl;
 
 import gateway.wrb.domain.ER001Info;
+import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.model.ER001DTO;
 import gateway.wrb.repositories.ER001Repo;
 import gateway.wrb.util.Validator;
@@ -80,6 +81,8 @@ public class ER001RepoImpl implements ER001Repo {
             for (int i = 0; i < rs.size(); ++i) {
                 Object[] row = (Object[]) rs.get(i);
                 ER001DTO er001DTO = convertDTO((ER001Info) row[0]);
+                er001DTO.setBankRcvDt(((FbkFilesInfo) row[1]).getTmsdts());
+                er001DTO.setBankRcvTm(((FbkFilesInfo) row[1]).getTmstms());
                 er001DTOS.add(er001DTO);
             }
         } catch (Exception e) {
@@ -91,32 +94,33 @@ public class ER001RepoImpl implements ER001Repo {
     private ER001DTO convertDTO(ER001Info er001Info) {
         ER001DTO er001DTO = new ER001DTO();
         er001DTO.setNoticeDt(er001Info.getNoticeDt());
-        er001DTO.setNoticeCnt(er001Info.getNoticeCnt());
-        er001DTO.setFromCcy(er001Info.getToCcy());
+        er001DTO.setNoticeCnt(er001Info.getNoticeCnt().toString());
+        er001DTO.setFromCcy(er001Info.getFromCcy());
+        er001DTO.setToCcy(er001Info.getToCcy());
         if (Validator.validate(er001Info.getBaseRate())) {
-            er001DTO.setBaseRate(er001Info.getBaseRate());
+            er001DTO.setBaseRate(er001Info.getBaseRate().toString());
         } else {
-            er001DTO.setBaseRate(new BigDecimal(0));
+            er001DTO.setBaseRate("0.00");
         }
         if (Validator.validate(er001Info.getCashBuying())) {
-            er001DTO.setCashBuying(er001Info.getCashBuying());
+            er001DTO.setCashBuying(er001Info.getCashBuying().toString());
         } else {
-            er001DTO.setCashBuying(new BigDecimal(0));
+            er001DTO.setCashBuying("0.00");
         }
         if (Validator.validate(er001Info.getCashSelling())) {
-            er001DTO.setCashSelling(er001Info.getCashSelling());
+            er001DTO.setCashSelling(er001Info.getCashSelling().toString());
         } else {
-            er001DTO.setCashSelling(new BigDecimal(0));
+            er001DTO.setCashSelling("0.00");
         }
         if (Validator.validate(er001Info.getTtBuying())) {
-            er001DTO.setTtBuying(er001Info.getTtBuying());
+            er001DTO.setTtBuying(er001Info.getTtBuying().toString());
         } else {
-            er001DTO.setTtBuying(new BigDecimal(0));
+            er001DTO.setTtBuying("0.00");
         }
         if (Validator.validate(er001Info.getTtSelling())) {
-            er001DTO.setTtSelling(er001Info.getTtSelling());
+            er001DTO.setTtSelling(er001Info.getTtSelling().toString());
         } else {
-            er001DTO.setTtSelling(new BigDecimal(0));
+            er001DTO.setTtSelling("0.00");
         }
         er001DTO.setOrderDscd(er001Info.getOrderDscd());
         er001DTO.setStatus(er001Info.getStatus());
