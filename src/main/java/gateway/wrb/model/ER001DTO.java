@@ -2,8 +2,6 @@ package gateway.wrb.model;
 
 import lombok.Data;
 
-import java.math.BigDecimal;
-
 @Data
 public class ER001DTO {
     private Long er001id;

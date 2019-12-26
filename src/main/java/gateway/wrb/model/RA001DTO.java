@@ -5,22 +5,22 @@ import lombok.Data;
 
 @Data
 public class RA001DTO {
-    private String wdrActNo;
-    private String msgTrno;
-    private String trnStDt;
-    private String trnClsDt;
-    private String status;
-    private String curCd;
-    private String rcpAm;
-    private String rcpCnt;
-    private String outParticular;
-    private String inParticular;
-    private String cus_id_no_cd;
-    private String cus_id_no;
-    private String isuDt;
-    private String vld_edt;
-    private String bankRcvDt;
-    private String bankRcvTm;
+    private String wdrActNo = "";
+    private String msgTrno = "";
+    private String trnStDt = "";
+    private String trnClsDt = "";
+    private String status = "";
+    private String curCd = "";
+    private String rcpAm = "";
+    private String rcpCnt = "";
+    private String outParticular = "";
+    private String inParticular = "";
+    private String cus_id_no_cd = "";
+    private String cus_id_no = "";
+    private String isuDt = "";
+    private String vld_edt = "";
+    private String bankRcvDt = "";
+    private String bankRcvTm = "";
 
     public void convertToDTO(RA001Info ra001Info) {
         this.wdrActNo = ra001Info.getWdrActNo();

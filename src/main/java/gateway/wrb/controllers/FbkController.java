@@ -2,7 +2,6 @@ package gateway.wrb.controllers;
 
 import gateway.wrb.config.FbkConfig;
 import gateway.wrb.constant.FileType;
-import gateway.wrb.domain.ER001Info;
 import gateway.wrb.domain.FbkFilesInfo;
 import gateway.wrb.model.*;
 import gateway.wrb.services.*;
