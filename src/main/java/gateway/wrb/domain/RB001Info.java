@@ -83,4 +83,7 @@ public class RB001Info implements Serializable {
 
     @Column(name = "filler")
     private String filler;
+
+    @Column(name = "trxId")
+    private String trxId;
 }

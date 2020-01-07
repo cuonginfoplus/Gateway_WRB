@@ -483,12 +483,18 @@ public class FbkController {
     public ResponseEntity<?> postRB001(@RequestBody RB001Model model) {
         logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         String sndDir = fbkConfig.getFbkSend();
+        String trxId = null;
+        boolean isCreated = false;
         if (model != null) {
             //create request file
-            rb001Service.createRB001Req(sndDir, model);
+            trxId = rb001Service.createRB001Req(sndDir, model);
         }
         logger.info("--------- END ---------- ::" + System.currentTimeMillis());
-        return new ResponseEntity<>(DateUtils.dateYYYMMDDHHMMSS(), HttpStatus.OK);
+        if (Validator.validateString(trxId)) {
+            return new ResponseEntity<>(trxId, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Not Accept to Post Duplicate Data", HttpStatus.NOT_ACCEPTABLE);
+        }
     }
 
     // Crawl FBK file from Woori server

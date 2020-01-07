@@ -18,4 +18,6 @@ public interface RB001Repo {
                          String rcvbk2Cd, String status, String refNo);
 
     List<RB001SDTO> filterRB001S(String orgCd, String bankCd, String bankCoNo, String trnxId);
+
+    void update(String sndFileName, String trxId);
 }

@@ -15,7 +15,7 @@ public interface RB001Service {
 
     boolean isRB001exist(RB001Info rb001Info);
 
-    public void createRB001Req(String dir, RB001Model model);
+    public String createRB001Req(String dir, RB001Model model);
 
     List<RB001SDTO> getRB001S(String orgCd, String bankCd, String bankCoNo, String trnxId);
 }

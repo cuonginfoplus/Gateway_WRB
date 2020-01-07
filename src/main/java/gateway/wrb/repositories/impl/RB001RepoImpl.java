@@ -84,13 +84,32 @@ public class RB001RepoImpl implements RB001Repo {
     }
 
     @Override
+    public void update(String sndFileName, String trxId) {
+        String hql = "UPDATE RB001Info rb001 SET rb001.trxId=:trxId WHERE rb001.fbkname=:fbkname";
+        Query query = entityManager.createQuery(hql);
+        query.setParameter("trxId", trxId);
+        query.setParameter("fbkname", sndFileName);
+
+        int rowsUpdated = query.executeUpdate();
+        System.out.println(rowsUpdated);
+    }
+
+    @Override
     public List<RB001DTO> filterRB001(String orgCd, String bankCd, String bankCoNo, String trnxId) {
+        String getInpFBK = "FROM RB001Info AS rb001 WHERE rb001.trxId=:trxId";
+        Query queryInpBK = entityManager.createQuery(getInpFBK);
+        queryInpBK.setParameter("trxId", trnxId);
+        RB001Info rb001InfoInp = (RB001Info) queryInpBK.getSingleResult();
+        String inpFbkName = rb001InfoInp.getFbkname();
+        inpFbkName = inpFbkName.substring(11, inpFbkName.length());
+
         List<RB001DTO> rb001Infos = new ArrayList<>();
         String hql = "FROM RB001Info AS rb001 " +
                 "INNER JOIN RB001SInfo AS rb001s ON rb001s.fbkname = rb001.fbkname " +
-                "INNER JOIN FbkFilesInfo AS files ON files.fbkname = rb001.fbkname  WHERE rb001s.coNo=:bankCoNo ";
+                "INNER JOIN FbkFilesInfo AS files ON files.fbkname = rb001.fbkname  WHERE rb001s.coNo=:bankCoNo AND rb001s.fbkname LIKE :inpFbkName";
         Query query = entityManager.createQuery(hql);
         query.setParameter("bankCoNo", bankCoNo);
+        query.setParameter("inpFbkName", "%" + inpFbkName + "%");
         List<?> rs = query.getResultList();
         for (int i = 0; i < rs.size(); ++i) {
             Object[] row = (Object[]) rs.get(i);

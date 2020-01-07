@@ -330,7 +330,7 @@ public class RB001ServiceImpl implements RB001Service {
     }
 
     @Override
-    public void createRB001Req(String dir, RB001Model model) {
+    public String createRB001Req(String dir, RB001Model model) {
         int totReqCnt = 0;
         int totReqAmt = 0;
         FileUtils utils = new FileUtils();
@@ -352,14 +352,24 @@ public class RB001ServiceImpl implements RB001Service {
             if (isSave) {
                 contents.add(buildDataContent(rb001AccModels.get(i)));
                 totReqCnt++;
-                totReqAmt = totReqAmt + Integer.parseInt(rb001AccModels.get(i).getTrnAm());
+                int ident = rb001AccModels.get(i).getTrnAm().indexOf(".");
+                totReqAmt = totReqAmt + Integer.parseInt(rb001AccModels.get(i).getTrnAm().substring(0, ident));
             }
         }
 
         if (contents.size() > 1) {
             contents.add(buildEndContent(model, totReqCnt, totReqAmt));
             utils.createFile(path, contents);
+            String trxId = DateUtils.dateYYYMMDDHHMMSS();
+            updateRB001(sndFileName, trxId);
+            return trxId;
+        } else {
+            return null;
         }
+    }
+
+    private void updateRB001(String sndFileName, String trxId) {
+        rb001Repo.update(sndFileName, trxId);
     }
 
     @Override
