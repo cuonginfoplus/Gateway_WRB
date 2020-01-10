@@ -203,7 +203,6 @@ public class RV001ServiceImpl implements RV001Service {
                             rv001Repo.addRV001(rv001Info);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     logger.error(e.getMessage());
                 }
             });
@@ -211,7 +210,7 @@ public class RV001ServiceImpl implements RV001Service {
             // save fbk file into DB
             fbkFilesRepo.addFbkFile(fbkFilesInfo);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 }

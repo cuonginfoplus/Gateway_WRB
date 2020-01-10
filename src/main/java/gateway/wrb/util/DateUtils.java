@@ -162,7 +162,7 @@ public class DateUtils {
     }
 
     public static String nextDate(int next) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         Calendar c = Calendar.getInstance();
         c.add(Calendar.DATE, next);
         return sdf.format(c.getTime());

@@ -444,9 +444,7 @@ public class FbkController {
     public ResponseEntity<?> postRB001(@RequestBody RB001Model model) {
         String sndDir = fbkConfig.getFbkSend();
         String trxId = null;
-        boolean isCreated = false;
         if (model != null) {
-            //create request file
             trxId = rb001Service.createRB001Req(sndDir, model);
         }
         if (Validator.validateString(trxId)) {
@@ -477,7 +475,6 @@ public class FbkController {
         String fbkSend = fbkConfig.getFbkSend();
         List<String> fbkFiles = fbkFilesService.getSendFbkFiles(fbkSend);
         for (String fbkfile : fbkFiles) {
-            System.out.println(fbkfile);
             File file = new File(fbkfile);
             sftpUtils.putFileSftp(fbkConfig.getSftphost(), fbkConfig.getSftpport(), fbkConfig.getSftuser(), fbkConfig.getSftpassword(), file, fbkConfig.getFbkfromwrb());
 

@@ -163,6 +163,7 @@ public class ER001ServiceImpl implements ER001Service {
             fbkFilesRepo.addFbkFile(fbkFilesInfo);
         } catch (IOException e) {
             e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
     }

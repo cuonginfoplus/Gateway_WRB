@@ -150,7 +150,7 @@ public class RV002ServiceImpl implements RV002Service {
             });
             fbkFilesRepo.addFbkFile(fbkFilesInfo);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -186,23 +186,24 @@ public class RV002ServiceImpl implements RV002Service {
     }
 
     private String createSndFileName(String typeRv002Req, String orgCd) {
-        String strCurrDate = DateUtils.getDateFormat(new Date(), "yyyyMMdd");
+        String strCurrDate = DateUtils.getDateFormat(new Date(), DateUtils.DATE_FORMAT);
+
         String seq = "1";
-        SeqModel seqModel = seqCache.getItem("fbk_vir_101_" + strCurrDate);
+        SeqModel seqModel = seqCache.getItem(Constant.FBK_VIR_101 + strCurrDate);
 
         if (Validator.validate(seqModel)) {
             Integer nextVal = seqModel.getSeqValue();
             nextVal++;
-            seqCache.updateItem(new SeqModel("fbk_vir_101_" + strCurrDate, nextVal));
+            seqCache.updateItem(new SeqModel(Constant.FBK_VIR_101 + strCurrDate, nextVal));
         } else {
-            seqCache.addItem(new SeqModel("fbk_vir_101_" + strCurrDate, 1));
+            seqCache.addItem(new SeqModel(Constant.FBK_VIR_101 + strCurrDate, 1));
         }
-        SeqModel nextSeq = seqCache.getItem("fbk_vir_101_" + strCurrDate);
+        SeqModel nextSeq = seqCache.getItem(Constant.FBK_VIR_101 + strCurrDate);
         if (Validator.validate(nextSeq)) {
             seq = StringUtils.padLeftZeros(String.valueOf(nextSeq.getSeqValue()), 3);
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("fbk_vir_101_");
+        sb.append(Constant.FBK_VIR_101);
         sb.append(strCurrDate + "_");
         sb.append(orgCd + "_");
         sb.append(seq);
@@ -249,7 +250,7 @@ public class RV002ServiceImpl implements RV002Service {
         Integer aplDscdLength = rv002Config.getAplDscdLength();
         Integer fillerLength = rv002Config.getSfiller();
 
-        String strCurrDate = DateUtils.getDateFormat(new Date(), "yyyyMMdd");
+        String strCurrDate = DateUtils.getDateFormat(new Date(), DateUtils.DATE_FORMAT);
         DateFormat df2 = new SimpleDateFormat("HHmmss");
         String strCurrHour = df2.format(new Date());
 
@@ -268,7 +269,7 @@ public class RV002ServiceImpl implements RV002Service {
         Integer etotReqAmtLength = rv002Config.getEtotReqAmtLength();
         Integer efillerLength = rv002Config.getEfillerLength();
 
-        String strCurrDate = DateUtils.getDateFormat(new Date(), "yyyyMMdd");
+        String strCurrDate = DateUtils.getDateFormat(new Date(), DateUtils.DATE_FORMAT);
         DateFormat df2 = new SimpleDateFormat("HHmmss");
         String strCurrHour = df2.format(new Date());
 

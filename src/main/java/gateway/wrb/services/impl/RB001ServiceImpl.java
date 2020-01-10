@@ -260,13 +260,12 @@ public class RB001ServiceImpl implements RB001Service {
                         rb001Repo.save(info);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     logger.error(e.getMessage());
                 }
             });
             fbkFilesRepo.addFbkFile(fbkFilesInfo);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -324,7 +323,7 @@ public class RB001ServiceImpl implements RB001Service {
                 return true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+           logger.error(e.getMessage());
         }
         return false;
     }
@@ -454,15 +453,15 @@ public class RB001ServiceImpl implements RB001Service {
 
         // Gen Seq
         String seq = "1";
-        SeqModel seqModel = seqCache.getItem("rb001seq");
+        SeqModel seqModel = seqCache.getItem(Constant.RB001_SEQ);
         if (Validator.validate(seqModel)) {
             Integer nextVal = seqModel.getSeqValue();
             nextVal++;
-            seqCache.updateItem(new SeqModel("rb001seq", nextVal));
+            seqCache.updateItem(new SeqModel(Constant.RB001_SEQ, nextVal));
         } else {
-            seqCache.addItem(new SeqModel("rb001seq", 1));
+            seqCache.addItem(new SeqModel(Constant.RB001_SEQ, 1));
         }
-        SeqModel nextSeq = seqCache.getItem("rb001seq");
+        SeqModel nextSeq = seqCache.getItem(Constant.RB001_SEQ);
         if (Validator.validate(nextSeq)) {
             seq = Strings.padStart(String.valueOf(nextSeq.getSeqValue()), 10, '0');
         }
@@ -522,23 +521,23 @@ public class RB001ServiceImpl implements RB001Service {
     }
 
     private String createSndFileName(String fileType, String customerCode) {
-        String strCurrDate = DateUtils.getDateFormat(new Date(), "yyyyMMdd");
+        String strCurrDate = DateUtils.getDateFormat(new Date(), DateUtils.DATE_FORMAT);
         String seq = "1";
-        SeqModel seqModel = seqCache.getItem("fbk_ccr_099_" + strCurrDate);
+        SeqModel seqModel = seqCache.getItem(Constant.FBK_CCR_099 + strCurrDate);
 
         if (Validator.validate(seqModel)) {
             Integer nextVal = seqModel.getSeqValue();
             nextVal++;
-            seqCache.updateItem(new SeqModel("fbk_ccr_099_" + strCurrDate, nextVal));
+            seqCache.updateItem(new SeqModel(Constant.FBK_CCR_099 + strCurrDate, nextVal));
         } else {
-            seqCache.addItem(new SeqModel("fbk_ccr_099_" + strCurrDate, 1));
+            seqCache.addItem(new SeqModel(Constant.FBK_CCR_099 + strCurrDate, 1));
         }
-        SeqModel nextSeq = seqCache.getItem("fbk_ccr_099_" + strCurrDate);
+        SeqModel nextSeq = seqCache.getItem(Constant.FBK_CCR_099 + strCurrDate);
         if (Validator.validate(nextSeq)) {
             seq = StringUtils.padLeftZeros(String.valueOf(nextSeq.getSeqValue()), 3);
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("fbk_ccr_099_");
+        sb.append(Constant.FBK_CCR_099);
         sb.append(strCurrDate + "_");
         sb.append(customerCode + "_");
         sb.append(seq);

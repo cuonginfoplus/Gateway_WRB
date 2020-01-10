@@ -8,7 +8,7 @@ public class Validator {
         return null != value && !value.isEmpty();
     }
 
-    public static boolean validateStrings(String... args) {// trả về true nếu tất cả các phần tử trong list args ddefu khác null or empty
+    public static boolean validateStrings(String... args) {
         for (int i = 0; i < args.length; i++) {
             if (!validateString(args[i])) {
                 return false;

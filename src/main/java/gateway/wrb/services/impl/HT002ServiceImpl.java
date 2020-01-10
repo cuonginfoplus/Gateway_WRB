@@ -187,6 +187,7 @@ public class HT002ServiceImpl implements HT002Service {
             fbkFilesRepo.addFbkFile(fbkFilesInfo);
         } catch (IOException e) {
             e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 

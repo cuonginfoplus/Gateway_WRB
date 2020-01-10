@@ -254,7 +254,6 @@ public class RA001ServiceImpl implements RA001Service {
                 return false;
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error(e.getMessage());
         }
         return true;
@@ -319,6 +318,7 @@ public class RA001ServiceImpl implements RA001Service {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return false;
     }
@@ -331,7 +331,7 @@ public class RA001ServiceImpl implements RA001Service {
         Integer dataCntLength = ra001Config.getDataCntLength();
         Integer etcArLength = ra001Config.getEtcLength();
 
-        String strCurrDate = DateUtils.getDateFormat(new Date(), "yyyyMMdd");
+        String strCurrDate = DateUtils.getDateFormat(new Date(), DateUtils.DATE_FORMAT);
         DateFormat df2 = new SimpleDateFormat("HHmmss");
         String strCurrHour = df2.format(new Date());
 
@@ -388,23 +388,23 @@ public class RA001ServiceImpl implements RA001Service {
     }
 
     private String createSndFileName(String fileType, String customerCode) {
-        String strCurrDate = DateUtils.getDateFormat(new Date(), "yyyyMMdd");
+        String strCurrDate = DateUtils.getDateFormat(new Date(), DateUtils.DATE_FORMAT);
         String seq = "1";
-        SeqModel seqModel = seqCache.getItem("fbk_awa_099_" + strCurrDate);
+        SeqModel seqModel = seqCache.getItem(Constant.FBK_AWA_099 + strCurrDate);
 
         if (Validator.validate(seqModel)) {
             Integer nextVal = seqModel.getSeqValue();
             nextVal++;
-            seqCache.updateItem(new SeqModel("fbk_awa_099_" + strCurrDate, nextVal));
+            seqCache.updateItem(new SeqModel(Constant.FBK_AWA_099 + strCurrDate, nextVal));
         } else {
-            seqCache.addItem(new SeqModel("fbk_awa_099_" + strCurrDate, 1));
+            seqCache.addItem(new SeqModel(Constant.FBK_AWA_099 + strCurrDate, 1));
         }
-        SeqModel nextSeq = seqCache.getItem("fbk_awa_099_" + strCurrDate);
+        SeqModel nextSeq = seqCache.getItem(Constant.FBK_AWA_099 + strCurrDate);
         if (Validator.validate(nextSeq)) {
             seq = StringUtils.padLeftZeros(String.valueOf(nextSeq.getSeqValue()), 3);
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("fbk_awa_099_");
+        sb.append(Constant.FBK_AWA_099);
         sb.append(strCurrDate + "_");
         sb.append(customerCode + "_");
         sb.append(seq);

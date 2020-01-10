@@ -188,6 +188,7 @@ public class VLR001ServiceImpl implements VLR001Service {
             fbkFilesRepo.addFbkFile(fbkFilesInfo);
         } catch (IOException e) {
             e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
