@@ -119,14 +119,7 @@ public class RV002ServiceImpl implements RV002Service {
                         line = line.substring(trnAvlYnLength);
                         String corpRecCompCode = line.substring(0, corpRecCompCodeLength);
                         line = line.substring(corpRecCompCodeLength);
-                        String filler = null;
-                        try {
-                            line.substring(0, fillerLength);
-                            line = line.substring(fillerLength);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
+                        String filler = line.substring(0, fillerLength);
 
                         System.out.println("rv002Path : [" + fbkFilesInfo.getFullfbkpath() + ", outActNo :" + outActNo + ", virActNo:" + virActNo + ", virAcNm :" + virAcNm + ", refNo :" + refNo + ", recCodCd:" + recCodCd + ", trnAm:" + trnAm
                                 + ", trnAvlSdt:" + trnAvlSdt + ", trnAvlEdt:" + trnAvlEdt + ", trnAvlStm:" + trnAvlStm + ", trnAvlEtm:" + trnAvlEtm + ", trnAvlYn:" + trnAvlYn + ", corpRecCompCode:" + corpRecCompCode + ", filter:" + filler + "]");

@@ -352,8 +352,12 @@ public class RB001ServiceImpl implements RB001Service {
             if (isSave) {
                 contents.add(buildDataContent(rb001AccModels.get(i)));
                 totReqCnt++;
-                int ident = rb001AccModels.get(i).getTrnAm().indexOf(".");
-                totReqAmt = totReqAmt + Integer.parseInt(rb001AccModels.get(i).getTrnAm().substring(0, ident));
+                if (rb001AccModels.get(i).getTrnAm().contains(".")) {
+                    int ident = rb001AccModels.get(i).getTrnAm().indexOf(".");
+                    totReqAmt = totReqAmt + Integer.parseInt(rb001AccModels.get(i).getTrnAm().substring(0, ident));
+                } else {
+                    totReqAmt = totReqAmt + Integer.parseInt(rb001AccModels.get(i).getTrnAm());
+                }
             }
         }
 

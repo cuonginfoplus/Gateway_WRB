@@ -25,7 +25,7 @@ public class GatewayApplication {
 
     @Bean
     RedisTemplate<String, SeqModel> redisTemplate() {
-        RedisTemplate<String, SeqModel> redisTemplate = new RedisTemplate<String, SeqModel>();
+        RedisTemplate<String, SeqModel> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(jedisConnectionFactory());
         return redisTemplate;
     }

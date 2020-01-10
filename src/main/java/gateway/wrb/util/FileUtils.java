@@ -25,7 +25,7 @@ public class FileUtils {
         return result;
     }
 
-    public void moveFile(String inputFile, String outputFile, String fileName) {
+    public void moveFile(String inputFile, String outputFile, String fileName) throws IOException {
         InputStream inStream = null;
         OutputStream outStream = null;
         try {
@@ -55,6 +55,9 @@ public class FileUtils {
             System.out.println("File is copied successful!");
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            inStream.close();
+            outStream.close();
         }
     }
 

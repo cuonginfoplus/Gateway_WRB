@@ -17,19 +17,26 @@ import java.io.IOException;
 public class SftpUtils {
     public static final Logger logger = LoggerFactory.getLogger(FbkController.class);
 
-    public void getFilesSftp(String SFTPHOST, String SFTPPORT, String SFTPUSER, String SFTPPASS, String SFTPWORKINGDIR, String SFTPREMOTE) {
+    public void getFilesSftp(String SFTPHOST, String SFTPPORT, String SFTPUSER, String SFTPPASS, String SFTPWORKINGDIR, String SFTPREMOTE) throws IOException {
         Session session = null;
         Channel channel = null;
         ChannelSftp channelSftp = null;
+        SSHClient sshClient = new SSHClient();
         try {
             System.out.println("=============== Starting GET Files SFTP : ");
-            SSHClient sshClient = setupSshj(SFTPHOST, SFTPUSER, SFTPPASS);
+            sshClient = setupSshj(SFTPHOST, SFTPUSER, SFTPPASS);
             SFTPClient sftpClient = sshClient.newSFTPClient();
-            sftpClient.get(SFTPREMOTE, new FileSystemFile(SFTPWORKINGDIR));
+            try {
+                sftpClient.get(SFTPREMOTE, new FileSystemFile(SFTPWORKINGDIR));
+            } finally {
+                sftpClient.close();
+            }
             System.out.println("=============== End GET Files SFTP : " + sftpClient);
         } catch (Exception ex) {
             ex.printStackTrace();
             logger.error("SFTP : " + ex.getMessage());
+        } finally {
+            sshClient.disconnect();
         }
     }
 
@@ -37,11 +44,16 @@ public class SftpUtils {
         Session session = null;
         Channel channel = null;
         ChannelSftp channelSftp = null;
+        SSHClient sshClient = new SSHClient();
         try {
             System.out.println("=============== Starting PUT Files SFTP : ");
-            SSHClient sshClient = setupSshj(SFTPHOST, SFTPUSER, SFTPPASS);
+            sshClient = setupSshj(SFTPHOST, SFTPUSER, SFTPPASS);
             SFTPClient sftpClient = sshClient.newSFTPClient();
-            sftpClient.put(new FileSystemFile(file), SFTPREMOTE);
+            try {
+                sftpClient.put(new FileSystemFile(file), SFTPREMOTE);
+            } finally {
+                sftpClient.close();
+            }
             System.out.println("=============== End PUT Files SFTP : " + sftpClient);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -51,9 +63,15 @@ public class SftpUtils {
 
     private SSHClient setupSshj(String SFTPHOST, String SFTPUSER, String SFTPPASS) throws IOException {
         SSHClient client = new SSHClient();
-        client.addHostKeyVerifier(new PromiscuousVerifier());
-        client.connect(SFTPHOST);
-        client.authPassword(SFTPUSER, SFTPPASS);
+        try {
+            client.addHostKeyVerifier(new PromiscuousVerifier());
+            client.connect(SFTPHOST);
+            client.authPassword(SFTPUSER, SFTPPASS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            client.disconnect();
+        }
         return client;
     }
 }

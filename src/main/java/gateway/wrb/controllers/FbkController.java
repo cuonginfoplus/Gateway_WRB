@@ -72,12 +72,10 @@ public class FbkController {
 
     @GetMapping(value = "/all")
     public ResponseEntity<?> readFiles() {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<FbkFilesInfo> fbkList = new ArrayList<>();
         if (fbkList.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(fbkList, HttpStatus.OK);
     }
 
@@ -91,26 +89,19 @@ public class FbkController {
             @RequestParam(value = "rgsTrnSdt", defaultValue = "") String bankRsvSdt,
             @RequestParam(value = "rgsTrnEdt", defaultValue = "") String bankRsvEdt
     ) {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
-//        List<RV001Info> rv001InfoList = rv001Service.getRV001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
-
         List<RV001DTO> rv001DTOS = vlr001Service.getVLR001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(rv001DTOS, HttpStatus.OK);
     }
 
     // V1.2 VirAccount Change
     @PostMapping(value = "/rv002", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> postRV002(@RequestBody RV002Model model) throws IOException {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         String sndDir = fbkConfig.getFbkSend();
 
         if (model != null) {
             //create request file
             rv002Service.createRV002Req(sndDir, model);
         }
-
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(DateUtils.dateYYYMMDDHHMMSS(), HttpStatus.OK);
     }
 
@@ -124,9 +115,7 @@ public class FbkController {
             @RequestParam(value = "InqSdt", defaultValue = "") String InqSdt,
             @RequestParam(value = "InqEdt", defaultValue = "") String InqEdt
     ) {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<HT002DTO> ht002InfoList = ht002Service.getHT002(orgCd, bankCd, bankCoNo, outActNo, InqSdt, InqEdt);
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(ht002InfoList, HttpStatus.OK);
     }
 
@@ -140,9 +129,7 @@ public class FbkController {
             @RequestParam(value = "bankRsvSdt", defaultValue = "") String bankRsvSdt,
             @RequestParam(value = "bankRsvEdt", defaultValue = "") String bankRsvEdt
     ) {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<RA001DTO> ra001InfoList = ra001Service.getRA001(orgCd, bankCd, bankCoNo, outActNo, bankRsvSdt, bankRsvEdt);
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(ra001InfoList, HttpStatus.OK);
     }
 
@@ -154,9 +141,7 @@ public class FbkController {
             @Valid @NotBlank @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo,
             @Valid @NotBlank @RequestParam(value = "trnxId", defaultValue = "") String trnxId
     ) {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<RB001DTO> er001Infos = rb001Service.getRB001(orgCd, bankCd, bankCoNo, trnxId);
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(er001Infos, HttpStatus.OK);
     }
 
@@ -168,9 +153,7 @@ public class FbkController {
             @Valid @NotBlank @RequestParam(value = "bankCoNo", defaultValue = "") String bankCoNo,
             @Valid @NotBlank @RequestParam(value = "trnxId", defaultValue = "") String trnxId
     ) {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<RB001SDTO> er001Infos = rb001Service.getRB001S(orgCd, bankCd, bankCoNo, trnxId);
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(er001Infos, HttpStatus.OK);
     }
 
@@ -183,16 +166,13 @@ public class FbkController {
             @RequestParam("noticeSdt") String noticeSdt,
             @RequestParam("noticeEdt") String noticeEdt
     ) {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         List<ER001DTO> er001Infos = er001Service.getER001(orgCd, bankCd, bankCoNo, noticeSdt, noticeEdt);
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(er001Infos, HttpStatus.OK);
     }
 
     @Scheduled(cron = "0 9 12,19 * * *")
     @GetMapping(value = "/imprv001")
-    public ResponseEntity<?> importrv001() {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+    public ResponseEntity<?> importrv001() throws IOException {
         List<FbkFilesInfo> rv001Files = new ArrayList<>();
         String directory = fbkConfig.getFbkPath();
         List<Map<String, FbkFilesInfo>> fbkFiles = fbkFilesService.getFbkFiles(directory); //list of file .DAT (not .BAK)
@@ -216,14 +196,12 @@ public class FbkController {
         if (rv001Files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(rv001Files, HttpStatus.OK);
     }
 
     @Scheduled(cron = "0 4 12,19 * * *")
     @GetMapping(value = "/imprv002")
-    public ResponseEntity<?> importrv002() {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+    public ResponseEntity<?> importrv002() throws IOException {
         List<FbkFilesInfo> rv002Files = new ArrayList<>();
         String directory = fbkConfig.getFbkPath();
         List<Map<String, FbkFilesInfo>> fbkFiles = fbkFilesService.getFbkFiles(directory);
@@ -246,14 +224,12 @@ public class FbkController {
         if (rv002Files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(rv002Files, HttpStatus.OK);
     }
 
     @Scheduled(cron = "0 13 12,19 * * *")
     @GetMapping(value = "/impht002")
-    public ResponseEntity<?> importht002() {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+    public ResponseEntity<?> importht002() throws IOException {
         List<FbkFilesInfo> ht002Files = new ArrayList<>();
         String directory = fbkConfig.getFbkPath();
         List<Map<String, FbkFilesInfo>> fbkFiles = fbkFilesService.getFbkFiles(directory);
@@ -278,7 +254,6 @@ public class FbkController {
         if (ht002Files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(ht002Files, HttpStatus.OK);
     }
 
@@ -289,8 +264,7 @@ public class FbkController {
      */
     @Scheduled(cron = "0 8 12,19 * * *")
     @GetMapping(value = "/imper001")
-    public ResponseEntity<?> importER001() {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+    public ResponseEntity<?> importER001() throws IOException {
         List<FbkFilesInfo> er001Files = new ArrayList<>();
         String directory = fbkConfig.getFbkPath();
         List<Map<String, FbkFilesInfo>> fbkFiles = fbkFilesService.getFbkFiles(directory);
@@ -315,7 +289,6 @@ public class FbkController {
         if (er001Files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(er001Files, HttpStatus.OK);
     }
 
@@ -326,8 +299,7 @@ public class FbkController {
      */
     @Scheduled(cron = "0 3 12,19 * * *")
     @GetMapping(value = "/imppr001")
-    public ResponseEntity<?> imporPR001() {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+    public ResponseEntity<?> imporPR001() throws IOException {
         List<FbkFilesInfo> files = new ArrayList<>();
         String directory = fbkConfig.getFbkPath();
         List<Map<String, FbkFilesInfo>> fbkFiles = fbkFilesService.getFbkFiles(directory);
@@ -351,7 +323,6 @@ public class FbkController {
         if (files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(files, HttpStatus.OK);
     }
 
@@ -362,8 +333,7 @@ public class FbkController {
      */
     @Scheduled(cron = "0 15 12,19 * * *")
     @GetMapping(value = "/impvlr001")
-    public ResponseEntity<?> imporVLR001() {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+    public ResponseEntity<?> imporVLR001() throws IOException {
         List<FbkFilesInfo> files = new ArrayList<>();
         String directory = fbkConfig.getFbkPath();
         List<Map<String, FbkFilesInfo>> fbkFiles = fbkFilesService.getFbkFiles(directory);
@@ -387,7 +357,6 @@ public class FbkController {
         if (files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(files, HttpStatus.OK);
     }
 
@@ -399,8 +368,7 @@ public class FbkController {
 
     @Scheduled(cron = "0 10 12,19 * * *")
     @GetMapping(value = "/impra001")
-    public ResponseEntity<?> importRA001() {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+    public ResponseEntity<?> importRA001() throws IOException {
         List<FbkFilesInfo> ra001Files = new ArrayList<>();
         String directory = fbkConfig.getFbkPath();
         List<Map<String, FbkFilesInfo>> fbkFiles = fbkFilesService.getFbkFiles(directory);
@@ -421,14 +389,12 @@ public class FbkController {
         if (ra001Files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(ra001Files, HttpStatus.OK);
     }
 
     @Scheduled(cron = "0 5 12,19 * * *")
     @GetMapping(value = "/imprb001")
-    public ResponseEntity<?> importRB001() {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
+    public ResponseEntity<?> importRB001() throws IOException {
         List<FbkFilesInfo> rb001Files = new ArrayList<>();
         String directory = fbkConfig.getFbkPath();
         List<Map<String, FbkFilesInfo>> fbkFiles = fbkFilesService.getFbkFiles(directory);
@@ -449,7 +415,6 @@ public class FbkController {
         if (rb001Files.isEmpty()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(rb001Files, HttpStatus.OK);
     }
 
@@ -461,15 +426,11 @@ public class FbkController {
      */
     @PostMapping(value = "/ra001", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> postRA001(@RequestBody RA001Model model) throws IOException {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         String sndDir = fbkConfig.getFbkSend();
-
         if (model != null) {
             //create request file
             ra001Service.createRA001Req(sndDir, model);
         }
-
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         return new ResponseEntity<>(DateUtils.dateYYYMMDDHHMMSS(), HttpStatus.OK);
     }
 
@@ -481,7 +442,6 @@ public class FbkController {
      */
     @PostMapping(value = "/rb001")
     public ResponseEntity<?> postRB001(@RequestBody RB001Model model) {
-        logger.info("--------- START ---------- ::" + System.currentTimeMillis());
         String sndDir = fbkConfig.getFbkSend();
         String trxId = null;
         boolean isCreated = false;
@@ -489,7 +449,6 @@ public class FbkController {
             //create request file
             trxId = rb001Service.createRB001Req(sndDir, model);
         }
-        logger.info("--------- END ---------- ::" + System.currentTimeMillis());
         if (Validator.validateString(trxId)) {
             return new ResponseEntity<>(trxId, HttpStatus.OK);
         } else {
@@ -499,7 +458,7 @@ public class FbkController {
 
     // Crawl FBK file from Woori server
     @Scheduled(cron = "0 0 12,19 * * *")
-    public void scheduleFbkFiles() {
+    public void scheduleFbkFiles() throws IOException {
         // get Files from SFTP
         SftpUtils sftpUtils = new SftpUtils();
         String SFTPHOST = fbkConfig.getSftphost();
@@ -513,7 +472,7 @@ public class FbkController {
 
     // Put file to Woori Serverw
     @Scheduled(cron = "0 30 12,19 * * *")
-    public void schedulePutFbkFiles() {
+    public void schedulePutFbkFiles() throws IOException {
         SftpUtils sftpUtils = new SftpUtils();
         String fbkSend = fbkConfig.getFbkSend();
         List<String> fbkFiles = fbkFilesService.getSendFbkFiles(fbkSend);
